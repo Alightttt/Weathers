@@ -1,4 +1,3 @@
-
 // Weather API utilities
 
 export interface WeatherData {
@@ -49,9 +48,12 @@ export interface ForecastData {
   };
 }
 
+// Hardcoded API key for the application
+const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY_HERE';
+
 // Get API key from env or local storage
 const getApiKey = () => {
-  return localStorage.getItem("openWeatherApiKey") || "";
+  return API_KEY;
 };
 
 // Convert from Kelvin to Celsius
