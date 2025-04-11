@@ -6,9 +6,11 @@ import CurrentWeather from '@/components/CurrentWeather';
 import ForecastSection from '@/components/ForecastSection';
 import HourlyChart from '@/components/HourlyChart';
 import LocationHeader from '@/components/LocationHeader';
+import GeolocationPrompt from '@/components/GeolocationPrompt';
 import { 
   fetchCurrentWeather, 
   fetchForecast, 
+  getUserCoordinates,
   getLastCity, 
   saveLastCity, 
   WeatherData, 
@@ -23,20 +25,21 @@ const Index = () => {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [bgGradient, setBgGradient] = useState<string>("from-gray-950 to-gray-900");
+  const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
 
-  const loadWeatherData = async (city: string) => {
+  const loadWeatherData = async (city: string, coords?: {latitude: number, longitude: number}) => {
     setIsLoading(true);
 
     try {
       const [weatherData, forecastData] = await Promise.all([
-        fetchCurrentWeather(city),
-        fetchForecast(city)
+        fetchCurrentWeather(city, coords),
+        fetchForecast(city, coords)
       ]);
 
       setCurrentWeather(weatherData);
       setForecast(forecastData);
-      setCurrentCity(city);
-      saveLastCity(city);
+      setCurrentCity(weatherData.name || city);
+      saveLastCity(weatherData.name || city);
 
       // Set background gradient based on weather condition
       if (weatherData.weather && weatherData.weather[0]) {
@@ -45,13 +48,13 @@ const Index = () => {
 
       toast({
         title: "Weather Updated",
-        description: `Latest weather data for ${city} has been loaded`,
+        description: `Latest weather data for ${weatherData.name || city} has been loaded`,
       });
     } catch (error) {
       console.error('Error fetching weather data:', error);
       toast({
         title: "Error",
-        description: `Failed to load weather data for ${city}. Please check the city name and try again.`,
+        description: `Failed to load weather data. Please try again later.`,
         variant: "destructive",
       });
     } finally {
@@ -63,23 +66,75 @@ const Index = () => {
     loadWeatherData(city);
   };
 
+  const handleAllowLocation = async () => {
+    setLocationPrompted(true);
+    try {
+      const coords = await getUserCoordinates();
+      loadWeatherData("", coords); // Empty city string as we'll get it from coords
+    } catch (error) {
+      console.error('Error getting user coordinates:', error);
+      // Fall back to last city or Berlin
+      loadWeatherData(getLastCity());
+    }
+  };
+
+  const handleDenyLocation = () => {
+    setLocationPrompted(true);
+    // Use the default city
+    loadWeatherData(getLastCity());
+  };
+
   useEffect(() => {
-    loadWeatherData(currentCity);
+    // On first load, prompt for location
+    const checkForLocation = () => {
+      if (navigator.permissions) {
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+          if (result.state === 'granted') {
+            // Permission was already granted, use it directly
+            handleAllowLocation();
+          } else if (result.state === 'prompt') {
+            // We need to ask for permission
+            setLocationPrompted(false);
+          } else {
+            // Permission was denied previously
+            handleDenyLocation();
+          }
+        });
+      } else {
+        // Browsers that don't support the permissions API
+        setLocationPrompted(false);
+      }
+    };
+
+    checkForLocation();
   }, []);
+
+  if (!locationPrompted) {
+    return (
+      <div className={`min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 py-8 px-4 transition-colors duration-1000 flex items-center justify-center`}>
+        <div className="max-w-md w-full mx-auto">
+          <GeolocationPrompt 
+            onAllowLocation={handleAllowLocation} 
+            onDenyLocation={handleDenyLocation} 
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${bgGradient} py-8 px-4 transition-colors duration-1000`}>
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
           <div className="flex-1">
             {currentWeather && (
               <LocationHeader 
-                city={currentWeather.name} 
+                city={currentWeather.name || currentCity} 
                 country={currentWeather.sys?.country || ''}
               />
             )}
           </div>
-          <div className="w-64">
+          <div className="w-full md:w-64">
             <CitySearch onSearch={handleSearch} defaultCity={currentCity} />
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 // Weather API utilities
 
 // New interfaces for Open-Meteo API
@@ -11,10 +12,15 @@ export interface WeatherData {
     rain: number;
     showers: number;
     snowfall: number;
+    wind_speed_10m?: number;
+    wind_direction_10m?: number;
+    time?: string;
   };
   current_units: {
     temperature_2m: string;
     relative_humidity_2m: string;
+    wind_speed_10m?: string;
+    wind_direction_10m?: string;
   };
   daily: {
     time: string[];
@@ -54,8 +60,13 @@ export interface WeatherData {
 // ForecastData is now the same as WeatherData since Open-Meteo returns everything in one call
 export type ForecastData = WeatherData;
 
-// Open-Meteo API URL
-const API_URL = "https://api.open-meteo.com/v1/forecast?latitude=52.520001,NaN&longitude=13.410001,NaN&daily=sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,uv_index_clear_sky_max,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration,apparent_temperature_min,apparent_temperature_max,temperature_2m_min,temperature_2m_max,weather_code&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,apparent_temperature,rain,showers,snowfall,snow_depth&current=temperature_2m,relative_humidity_2m,is_day,apparent_temperature,snowfall,showers,rain,precipitation&timezone=Europe%2FLondon&past_days=7&forecast_days=14";
+// Generate Open-Meteo API URL with coordinates
+export const generateApiUrl = (lat: number, lon: number): string => {
+  return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,uv_index_clear_sky_max,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration,apparent_temperature_min,apparent_temperature_max,temperature_2m_min,temperature_2m_max,weather_code&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,apparent_temperature,rain,showers,snowfall,snow_depth&current=temperature_2m,relative_humidity_2m,is_day,apparent_temperature,snowfall,showers,rain,precipitation,wind_speed_10m,wind_direction_10m&timezone=Europe%2FLondon&past_days=7&forecast_days=14`;
+};
+
+// Default API URL for Berlin if geolocation fails
+const DEFAULT_API_URL = "https://api.open-meteo.com/v1/forecast?latitude=52.520001&longitude=13.410001&daily=sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,uv_index_clear_sky_max,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration,apparent_temperature_min,apparent_temperature_max,temperature_2m_min,temperature_2m_max,weather_code&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,apparent_temperature,rain,showers,snowfall,snow_depth&current=temperature_2m,relative_humidity_2m,is_day,apparent_temperature,snowfall,showers,rain,precipitation,wind_speed_10m,wind_direction_10m&timezone=Europe%2FLondon&past_days=7&forecast_days=14";
 
 // Convert from Kelvin to Celsius
 export const kelvinToCelsius = (kelvin: number): number => {
@@ -77,6 +88,16 @@ export const formatDate = (timestamp: string | number): string => {
   }).format(date);
 };
 
+// Format time
+export const formatTime = (timestamp: string): string => {
+  const date = new Date(timestamp);
+  return new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true
+  }).format(date);
+};
+
 // Get day of week
 export const getDayOfWeek = (timestamp: string | number): string => {
   const date = typeof timestamp === 'number' ? new Date(timestamp * 1000) : new Date(timestamp);
@@ -87,6 +108,13 @@ export const getDayOfWeek = (timestamp: string | number): string => {
 export const getHour = (timestamp: string | number): string => {
   const date = typeof timestamp === 'number' ? new Date(timestamp * 1000) : new Date(timestamp);
   return new Intl.DateTimeFormat('en-US', { hour: 'numeric' }).format(date);
+};
+
+// Convert wind direction in degrees to cardinal direction
+export const degreesToDirection = (degrees: number): string => {
+  const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const index = Math.round(degrees / 22.5) % 16;
+  return directions[index];
 };
 
 // Map weather code to weather condition
@@ -124,25 +152,69 @@ export const getWeatherIcon = (code: number, isDay: boolean = true): string => {
   return isDay ? "50d" : "50n"; // Default
 };
 
-// Function to save the API key to local storage
-export const saveApiKey = (apiKey: string): void => {
-  localStorage.setItem('weatherApiKey', apiKey);
+// Get user's coordinates with Geolocation API
+export const getUserCoordinates = (): Promise<{latitude: number, longitude: number}> => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser'));
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        reject(error);
+      },
+      { timeout: 10000 } // 10 second timeout
+    );
+  });
 };
 
-// Function to get the saved API key from local storage
-export const getApiKey = (): string | null => {
-  return localStorage.getItem('weatherApiKey');
+// Function to get city name from coordinates using reverse geocoding
+export const getCityFromCoords = async (lat: number, lon: number): Promise<string> => {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+    const data = await response.json();
+    
+    // Extract city name from response
+    const city = data.address?.city || 
+                data.address?.town || 
+                data.address?.village || 
+                data.address?.county ||
+                data.address?.state ||
+                "Unknown Location";
+    
+    return city;
+  } catch (error) {
+    console.error('Error fetching city name:', error);
+    return "Unknown Location";
+  }
 };
 
 // Fetch weather data using Open-Meteo API
-export const fetchCurrentWeather = async (city: string): Promise<WeatherData> => {
+export const fetchCurrentWeather = async (city?: string, coords?: {latitude: number, longitude: number}): Promise<WeatherData> => {
   try {
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      throw new Error('No API key found');
+    let apiUrl = DEFAULT_API_URL;
+    let locationName = city || "Berlin";
+    
+    // If coordinates are provided, use them to generate API URL
+    if (coords) {
+      apiUrl = generateApiUrl(coords.latitude, coords.longitude);
+      // Try to get the city name from coordinates
+      try {
+        locationName = await getCityFromCoords(coords.latitude, coords.longitude);
+      } catch (error) {
+        console.warn('Could not get city name from coordinates:', error);
+      }
     }
-
-    const response = await fetch(API_URL);
+    
+    const response = await fetch(apiUrl);
     
     if (!response.ok) {
       throw new Error("Failed to fetch weather data");
@@ -151,7 +223,7 @@ export const fetchCurrentWeather = async (city: string): Promise<WeatherData> =>
     const data = await response.json();
     
     // Add city name manually since Open-Meteo doesn't provide it
-    data.name = city;
+    data.name = locationName;
     
     // Add weather information in a format compatible with existing components
     const todayIndex = 7; // Today's index (since past_days=7)
@@ -175,8 +247,8 @@ export const fetchCurrentWeather = async (city: string): Promise<WeatherData> =>
 
 // Since Open-Meteo returns both current and forecast data in one call,
 // we can reuse the same data
-export const fetchForecast = async (city: string): Promise<ForecastData> => {
-  return await fetchCurrentWeather(city);
+export const fetchForecast = async (city?: string, coords?: {latitude: number, longitude: number}): Promise<ForecastData> => {
+  return await fetchCurrentWeather(city, coords);
 };
 
 // Get weather icon URL
@@ -286,4 +358,13 @@ export const getWeatherTextColor = (weatherCondition: string): string => {
   
   // Default
   return "text-white";
+};
+
+// These functions are kept for API key backward compatibility but are no longer used
+export const saveApiKey = (apiKey: string): void => {
+  localStorage.setItem('weatherApiKey', apiKey);
+};
+
+export const getApiKey = (): string | null => {
+  return localStorage.getItem('weatherApiKey') || 'no-api-key-needed';
 };
