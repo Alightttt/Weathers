@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -114,7 +113,11 @@
 
 @layer components {
   .glass-card {
-    @apply bg-black/70 backdrop-blur-lg border border-white/10 rounded-xl shadow-2xl;
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
   }
   
   .weather-icon {
@@ -143,15 +146,39 @@ body {
   animation: lightning-flash 5s ease-out infinite;
 }
 
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in-out;
+}
+
 .temperature-text {
-  @apply text-7xl md:text-9xl font-light tracking-tighter;
+  font-size: 5rem;
+  font-weight: 600;
+  line-height: 1;
+  color: white;
 }
 
 .condition-text {
-  @apply text-2xl md:text-3xl font-medium tracking-wider;
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 .hourly-temp {
-  @apply text-xl font-semibold;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
+@media (max-width: 640px) {
+  .temperature-text {
+    font-size: 4rem;
+  }
+}
+
+.dark-theme {
+  background-color: #121212;
+  color: #ffffff;
+}

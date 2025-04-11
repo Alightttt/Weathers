@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { WeatherData, ForecastData } from '../types/weather';
 import { 
   fetchCurrentWeather, 
@@ -9,7 +9,7 @@ import {
   getLastCity,
   Coordinates 
 } from '../services/weatherService';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 
 export const useWeather = () => {
   const [currentCity, setCurrentCity] = useState<string>(getLastCity());
@@ -17,7 +17,6 @@ export const useWeather = () => {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [bgGradient, setBgGradient] = useState<string>("from-gray-950 to-gray-900");
-  const { toast } = useToast();
 
   const loadWeatherData = useCallback(async (city: string, coords?: Coordinates) => {
     setIsLoading(true);
@@ -77,12 +76,13 @@ export const useWeather = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   const handleLocationAccess = useCallback(async () => {
     try {
+      setIsLoading(true);
       const coords = await getUserCoordinates();
-      loadWeatherData("", coords); // Empty city string as we'll get it from coords
+      await loadWeatherData("", coords); // Empty city string as we'll get it from coords
       return true;
     } catch (error) {
       console.error('Error getting user coordinates:', error);
@@ -95,6 +95,17 @@ export const useWeather = () => {
   const handleSearch = useCallback((city: string) => {
     loadWeatherData(city);
   }, [loadWeatherData]);
+
+  // Initial data loading
+  useEffect(() => {
+    const initialLoad = async () => {
+      if (!currentWeather) {
+        loadWeatherData(currentCity);
+      }
+    };
+
+    initialLoad();
+  }, [currentCity, currentWeather, loadWeatherData]);
 
   return {
     currentCity,

@@ -19,23 +19,29 @@ const WeatherPage: React.FC = () => {
   const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
 
   useEffect(() => {
-    // On first load, prompt for location
-    const checkForLocation = () => {
+    // On first load, check if we already have permission
+    const checkForLocation = async () => {
       if (navigator.permissions) {
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        try {
+          const result = await navigator.permissions.query({ name: 'geolocation' });
+          
           if (result.state === 'granted') {
             // Permission was already granted, use it directly
-            handleLocationAccess();
             setLocationPrompted(true);
+            await handleLocationAccess();
           } else if (result.state === 'prompt') {
             // We need to ask for permission
             setLocationPrompted(false);
           } else {
             // Permission was denied previously
-            handleSearch(currentCity);
             setLocationPrompted(true);
+            handleSearch(currentCity);
           }
-        });
+        } catch (error) {
+          console.error('Error checking location permissions:', error);
+          setLocationPrompted(true);
+          handleSearch(currentCity);
+        }
       } else {
         // Browsers that don't support the permissions API
         setLocationPrompted(false);

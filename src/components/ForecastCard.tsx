@@ -16,7 +16,7 @@ const ForecastCard = ({
 }: ForecastCardProps) => {
   return (
     <div className="glass-card p-4 flex flex-col items-center transition-transform hover:scale-105">
-      <p className="text-sm font-medium text-gray-300 mb-1">{day}</p>
+      <p className="text-sm font-medium text-gray-300 mb-2">{day}</p>
       <div className="my-3">
         <WeatherIcon weatherCondition={weatherCondition} size="medium" />
       </div>

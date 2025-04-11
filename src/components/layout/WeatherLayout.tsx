@@ -13,8 +13,8 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
   bgGradient = "from-gray-950 to-gray-900" 
 }) => {
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${bgGradient} py-8 px-4 transition-colors duration-1000`}>
-      <div className="max-w-6xl mx-auto">
+    <div className={`min-h-screen bg-gradient-to-br ${bgGradient} py-8 px-4 transition-colors duration-1000 dark-theme`}>
+      <div className="max-w-5xl mx-auto">
         {children}
       </div>
       <Toaster />

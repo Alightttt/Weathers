@@ -1,9 +1,10 @@
 
 import { ForecastData, getDailyForecasts, getDayOfWeek } from '@/lib/weather-utils';
 import ForecastCard from './ForecastCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ForecastSectionProps {
-  data: ForecastData;
+  data: ForecastData | null;
   isLoading: boolean;
 }
 
@@ -13,9 +14,9 @@ const ForecastSection = ({ data, isLoading }: ForecastSectionProps) => {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 animate-pulse">
         {[...Array(5)].map((_, index) => (
           <div key={index} className="glass-card p-4 h-[130px]">
-            <div className="h-4 bg-gray-600/30 rounded w-12 mb-3 mx-auto"></div>
-            <div className="h-12 w-12 rounded-full bg-gray-600/30 mb-3 mx-auto"></div>
-            <div className="h-4 bg-gray-600/30 rounded w-20 mx-auto"></div>
+            <Skeleton className="h-4 bg-gray-600/30 rounded w-12 mb-3 mx-auto" />
+            <Skeleton className="h-12 w-12 rounded-full bg-gray-600/30 mb-3 mx-auto" />
+            <Skeleton className="h-4 bg-gray-600/30 rounded w-20 mx-auto" />
           </div>
         ))}
       </div>
@@ -23,10 +24,22 @@ const ForecastSection = ({ data, isLoading }: ForecastSectionProps) => {
   }
 
   if (!data) {
-    return null;
+    return (
+      <div className="glass-card p-4 text-center">
+        <p className="text-white/60">No forecast data available</p>
+      </div>
+    );
   }
 
   const dailyForecasts = getDailyForecasts(data);
+
+  if (!dailyForecasts || dailyForecasts.length === 0) {
+    return (
+      <div className="glass-card p-4 text-center">
+        <p className="text-white/60">No forecast data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 animate-fade-in">
