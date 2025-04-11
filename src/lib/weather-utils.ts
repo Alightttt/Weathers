@@ -1,4 +1,3 @@
-
 // Weather API utilities
 
 // New interfaces for Open-Meteo API
@@ -125,9 +124,24 @@ export const getWeatherIcon = (code: number, isDay: boolean = true): string => {
   return isDay ? "50d" : "50n"; // Default
 };
 
+// Function to save the API key to local storage
+export const saveApiKey = (apiKey: string): void => {
+  localStorage.setItem('weatherApiKey', apiKey);
+};
+
+// Function to get the saved API key from local storage
+export const getApiKey = (): string | null => {
+  return localStorage.getItem('weatherApiKey');
+};
+
 // Fetch weather data using Open-Meteo API
 export const fetchCurrentWeather = async (city: string): Promise<WeatherData> => {
   try {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      throw new Error('No API key found');
+    }
+
     const response = await fetch(API_URL);
     
     if (!response.ok) {

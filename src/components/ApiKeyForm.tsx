@@ -28,8 +28,8 @@ const ApiKeyForm = ({ onApiKeySet }: ApiKeyFormProps) => {
     <div className="glass-card p-8 animate-fade-in">
       <h2 className="text-2xl font-semibold mb-6 text-center">OpenWeatherMap API Key Required</h2>
       <p className="mb-6 text-gray-300 text-center">
-        To use this weather app, you need to provide an API key from OpenWeatherMap.
-        Get your free API key by signing up at <a href="https://openweathermap.org/api" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">openweathermap.org/api</a>
+        To use this weather app, you need to provide an API key from Open-Meteo.
+        <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline ml-1">open-meteo.com/docs</a>
       </p>
       
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -37,7 +37,7 @@ const ApiKeyForm = ({ onApiKeySet }: ApiKeyFormProps) => {
           <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Enter your OpenWeatherMap API key..."
+            placeholder="Enter your Open-Meteo API key..."
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             className="pl-10 bg-black/20 border-white/10 focus:border-white/20"
@@ -53,7 +53,7 @@ const ApiKeyForm = ({ onApiKeySet }: ApiKeyFormProps) => {
       
       <div className="mt-6 text-xs text-gray-400">
         <p>Your API key will be stored in your browser's local storage.</p>
-        <p>It won't be sent anywhere except to the OpenWeatherMap API.</p>
+        <p>It won't be sent anywhere except to the Open-Meteo API.</p>
       </div>
     </div>
   );
