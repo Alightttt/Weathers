@@ -18,16 +18,16 @@ const WeatherDashboard: React.FC<WeatherDashboardProps> = ({
 }) => {
   return (
     <>
-      <CurrentWeather data={currentWeather as WeatherData} isLoading={isLoading} />
+      <CurrentWeather data={currentWeather as any} isLoading={isLoading} />
       
       <div className="mt-6">
         <h3 className="text-lg font-medium text-white/80 mb-2">Hourly Forecast</h3>
-        <HourlyChart data={forecast as ForecastData} isLoading={isLoading} />
+        <HourlyChart data={forecast as any} isLoading={isLoading} />
       </div>
       
       <div className="mt-6">
         <h3 className="text-lg font-medium text-white/80 mb-2">5-Day Forecast</h3>
-        <ForecastSection data={forecast as ForecastData} isLoading={isLoading} />
+        <ForecastSection data={forecast as any} isLoading={isLoading} />
       </div>
       
       <div className="mt-8 text-center text-sm text-white/40">

@@ -1,5 +1,4 @@
-
-import { WeatherData, ForecastData } from '../types/weather';
+import { WeatherData, ForecastData, HourlyForecast, DailyForecast } from '../types/weather';
 
 export interface Coordinates {
   latitude: number;
@@ -159,6 +158,8 @@ export const fetchForecast = async (city: string, coords?: Coordinates): Promise
       hourly,
       daily,
       timezone_offset: data.timezone_offset || 0,
+      current: data.current || undefined,
+      current_units: data.current_units || undefined,
     };
   } catch (error) {
     console.error('Error fetching forecast:', error);
