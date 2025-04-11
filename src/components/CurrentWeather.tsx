@@ -1,6 +1,6 @@
 
 import { WeatherData } from '@/lib/weather-utils';
-import { kelvinToCelsius, formatDate, getWeatherTextColor } from '@/lib/weather-utils';
+import { formatDate, getWeatherTextColor } from '@/lib/weather-utils';
 import { Wind, Droplets } from 'lucide-react';
 import { AnimatedWeatherIcon } from './WeatherIcons';
 
@@ -24,30 +24,33 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     return null;
   }
 
-  const weatherCondition = data.weather[0].main;
-  const weatherDescription = data.weather[0].description;
+  const weatherCondition = data.weather?.[0]?.main || "Clear";
+  const weatherDescription = data.weather?.[0]?.description || "clear";
   const textColorClass = getWeatherTextColor(weatherCondition);
+  const today = new Date();
 
   return (
     <div className="glass-card p-8 animate-fade-in flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
       <div className="flex flex-col items-start z-10">
         <h1 className="text-8xl font-bold tracking-tighter mb-2">
-          {kelvinToCelsius(data.main.temp)}
+          {Math.round(data.current.temperature_2m)}
           <span className="text-4xl align-top ml-1">°C</span>
         </h1>
         <h2 className={`text-3xl font-semibold mb-4 capitalize ${textColorClass}`}>
           {weatherDescription}
         </h2>
-        <p className="text-sm text-gray-300 mb-6">{formatDate(data.dt)}</p>
+        <p className="text-sm text-gray-300 mb-6">{formatDate(today.toISOString())}</p>
         
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center space-x-2">
             <Wind className="h-5 w-5 text-blue-400" />
-            <span className="text-sm text-gray-200">{Math.round(data.wind.speed * 3.6)} km/h</span>
+            <span className="text-sm text-gray-200">
+              {data.daily?.wind_speed_10m_max?.[7] || 0} km/h
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <Droplets className="h-5 w-5 text-blue-400" />
-            <span className="text-sm text-gray-200">{data.main.humidity}%</span>
+            <span className="text-sm text-gray-200">{data.current.relative_humidity_2m}%</span>
           </div>
         </div>
       </div>

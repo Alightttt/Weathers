@@ -1,5 +1,5 @@
 
-import { ForecastData, getHourlyForecast, kelvinToCelsius, getHour } from '@/lib/weather-utils';
+import { ForecastData, getHourlyForecast, getHour } from '@/lib/weather-utils';
 import { WeatherIcon } from './WeatherIcons';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,21 +34,20 @@ const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
   }
 
   const hourlyData = getHourlyForecast(data);
-  const maxTemp = Math.max(...hourlyData.map(hour => kelvinToCelsius(hour.main.temp)));
-  const minTemp = Math.min(...hourlyData.map(hour => kelvinToCelsius(hour.main.temp)));
+  const maxTemp = Math.max(...hourlyData.map(hour => hour.main.temp));
+  const minTemp = Math.min(...hourlyData.map(hour => hour.main.temp));
   const range = maxTemp - minTemp;
   
   const calculateHeight = (temp: number) => {
-    const celsius = kelvinToCelsius(temp);
     // Min height should be 20% of available space
-    return range === 0 ? 50 : 20 + ((celsius - minTemp) / range) * 80;
+    return range === 0 ? 50 : 20 + ((temp - minTemp) / range) * 80;
   };
 
   return (
     <div className="glass-card p-6 mt-6 animate-fade-in relative">
       <div className="flex justify-between items-end mb-4 overflow-x-hidden">
         {hourlyData.map((hour, i) => {
-          const temp = kelvinToCelsius(hour.main.temp);
+          const temp = Math.round(hour.main.temp);
           const height = calculateHeight(hour.main.temp);
           
           return (

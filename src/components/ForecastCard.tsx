@@ -1,5 +1,4 @@
 
-import { kelvinToCelsius } from '@/lib/weather-utils';
 import { WeatherIcon } from './WeatherIcons';
 
 interface ForecastCardProps {
@@ -22,8 +21,8 @@ const ForecastCard = ({
         <WeatherIcon weatherCondition={weatherCondition} size="medium" />
       </div>
       <div className="flex justify-between items-center w-full mt-2">
-        <p className="text-sm font-semibold">{kelvinToCelsius(tempMax)}°</p>
-        <p className="text-sm text-gray-400">{kelvinToCelsius(tempMin)}°</p>
+        <p className="text-sm font-semibold">{Math.round(tempMax)}°</p>
+        <p className="text-sm text-gray-400">{Math.round(tempMin)}°</p>
       </div>
     </div>
   );
