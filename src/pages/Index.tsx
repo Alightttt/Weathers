@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import CitySearch from '@/components/CitySearch';
@@ -130,6 +129,7 @@ const Index = () => {
               <LocationHeader 
                 city={currentWeather.name || currentCity} 
                 country={currentWeather?.sys?.country || ''}
+                onSearch={handleSearch}
               />
             )}
           </div>
