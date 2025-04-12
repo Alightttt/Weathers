@@ -19,53 +19,51 @@ const WeatherPage: React.FC = () => {
   const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
 
   useEffect(() => {
-    // On first load, check if we already have permission
-    const checkForLocation = async () => {
+    // Check if we've shown the location prompt before
+    const hasPrompted = localStorage.getItem('locationPrompted');
+    
+    if (hasPrompted === 'true') {
+      setLocationPrompted(true);
+      
+      // Check if we already have permission
       if (navigator.permissions) {
-        try {
-          const result = await navigator.permissions.query({ name: 'geolocation' });
-          
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
-            // Permission was already granted, use it directly
-            setLocationPrompted(true);
-            await handleLocationAccess();
-          } else if (result.state === 'prompt') {
-            // We need to ask for permission
-            setLocationPrompted(false);
+            // Permission was already granted, use it
+            handleLocationAccess();
           } else {
-            // Permission was denied previously
-            setLocationPrompted(true);
+            // Use default city
             handleSearch(currentCity);
           }
-        } catch (error) {
-          console.error('Error checking location permissions:', error);
-          setLocationPrompted(true);
+        }).catch(() => {
+          // Handle error
           handleSearch(currentCity);
-        }
+        });
       } else {
-        // Browsers that don't support the permissions API
-        setLocationPrompted(false);
+        handleSearch(currentCity);
       }
-    };
-
-    checkForLocation();
+    } else {
+      setLocationPrompted(false);
+    }
   }, [currentCity, handleLocationAccess, handleSearch]);
 
   const handleAllowLocation = async () => {
     setLocationPrompted(true);
+    localStorage.setItem('locationPrompted', 'true');
     await handleLocationAccess();
   };
 
   const handleDenyLocation = () => {
     setLocationPrompted(true);
+    localStorage.setItem('locationPrompted', 'true');
     handleSearch(currentCity);
   };
 
   if (!locationPrompted) {
     return (
-      <WeatherLayout bgGradient="from-blue-400 to-blue-800">
+      <WeatherLayout>
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 max-w-md w-full mx-auto">
+          <div className="max-w-md w-full mx-auto">
             <LocationPrompt 
               onAllowLocation={handleAllowLocation}
               onDenyLocation={handleDenyLocation}

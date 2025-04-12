@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { MapPin, AlertCircle } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 interface LocationPromptProps {
   onAllowLocation: () => void;
@@ -19,7 +19,7 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
     setIsRequesting(true);
     
     if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser");
+      toast.error("Geolocation is not supported");
       onDenyLocation();
       setIsRequesting(false);
       return;
@@ -27,13 +27,11 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
 
     navigator.geolocation.getCurrentPosition(
       () => {
-        toast.success("Location access granted!");
         setIsRequesting(false);
         onAllowLocation();
       },
       (error) => {
         console.error("Geolocation error:", error);
-        toast.error("Could not access your location");
         setIsRequesting(false);
         onDenyLocation();
       },
@@ -42,22 +40,22 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
   };
 
   return (
-    <div className="glass-card p-8 animate-fade-in">
-      <div className="mb-6 text-center">
-        <MapPin className="h-16 w-16 mx-auto mb-4 text-blue-400" />
-        <h2 className="text-2xl font-semibold mb-2">Use Your Location</h2>
-        <p className="text-gray-300">
-          For the best weather experience, allow access to your location.
+    <div className="bg-white/20 backdrop-blur-md p-6 rounded-lg border border-white/10 shadow-lg">
+      <div className="mb-4 text-center">
+        <MapPin className="h-12 w-12 mx-auto mb-3 text-white" />
+        <h2 className="text-xl font-medium mb-2 text-white">Weather Location</h2>
+        <p className="text-white/80 text-sm">
+          Allow access to your location for local weather
         </p>
       </div>
 
       <div className="space-y-3">
         <Button 
           onClick={handleAllowLocation}
-          className="w-full bg-blue-600 hover:bg-blue-700"
+          className="w-full bg-white/20 hover:bg-white/30 text-white border-0"
           disabled={isRequesting}
         >
-          {isRequesting ? "Requesting Access..." : "Allow Location Access"}
+          {isRequesting ? "Getting Location..." : "Allow Location"}
         </Button>
         
         <Button 
@@ -65,16 +63,8 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
           variant="outline"
           className="w-full border-white/10 bg-transparent text-white hover:bg-white/10"
         >
-          Use Default Location (Berlin)
+          Use Default Location
         </Button>
-      </div>
-
-      <div className="mt-6 flex items-start gap-2 text-xs text-gray-400">
-        <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-        <p>
-          Your location is never stored on our servers and is only used to fetch
-          local weather information.
-        </p>
       </div>
     </div>
   );

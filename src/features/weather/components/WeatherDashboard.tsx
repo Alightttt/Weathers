@@ -3,6 +3,7 @@ import React from 'react';
 import CurrentWeather from '@/components/CurrentWeather';
 import ForecastSection from '@/components/ForecastSection';
 import HourlyChart from '@/components/HourlyChart';
+import WeeklyGraph from '@/components/WeeklyGraph';
 import { WeatherData, ForecastData } from '../types/weather';
 
 interface WeatherDashboardProps {
@@ -19,13 +20,13 @@ const WeatherDashboard: React.FC<WeatherDashboardProps> = ({
   if (!currentWeather && !isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-white/70">No weather data available. Please search for a city or allow location access.</p>
+        <p className="text-white/70">No weather data available</p>
       </div>
     );
   }
   
   return (
-    <>
+    <div className="space-y-4">
       <CurrentWeather data={currentWeather} isLoading={isLoading} />
       
       <div className="mt-4">
@@ -33,13 +34,13 @@ const WeatherDashboard: React.FC<WeatherDashboardProps> = ({
       </div>
       
       <div className="mt-4">
-        <ForecastSection data={forecast} isLoading={isLoading} />
+        <WeeklyGraph data={forecast} isLoading={isLoading} />
       </div>
       
-      <div className="mt-8 mb-4 text-center">
-        <p className="text-xs text-white/50">Data provided by Open-Meteo</p>
+      <div className="mt-4">
+        <ForecastSection data={forecast} isLoading={isLoading} />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -20,7 +20,7 @@ const WeatherNavBar: React.FC = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50">
       <div className="max-w-md mx-auto">
-        <div className="bg-white/15 backdrop-blur-xl rounded-t-3xl p-2 flex justify-around items-center">
+        <div className="bg-white/20 backdrop-blur-xl rounded-t-lg px-2 py-1 flex justify-around items-center">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.path;
             
@@ -51,14 +51,14 @@ interface NavButtonProps {
 
 const NavButton: React.FC<NavButtonProps> = ({ Icon, label, isActive, onClick, to }) => {
   const className = cn(
-    "flex flex-col items-center justify-center py-2 px-3 rounded-full transition-colors",
+    "flex flex-col items-center justify-center py-2 px-3 rounded-md transition-colors",
     isActive ? "text-white" : "text-white/60 hover:text-white"
   );
   
   if (onClick) {
     return (
       <button className={className} onClick={onClick}>
-        <Icon className={cn("h-5 w-5 mb-1", isActive && "text-blue-200")} />
+        <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
         <span className="text-xs">{label}</span>
       </button>
     );
@@ -66,7 +66,7 @@ const NavButton: React.FC<NavButtonProps> = ({ Icon, label, isActive, onClick, t
   
   return (
     <Link to={to} className={className}>
-      <Icon className={cn("h-5 w-5 mb-1", isActive && "text-blue-200")} />
+      <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
       <span className="text-xs">{label}</span>
     </Link>
   );

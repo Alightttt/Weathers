@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import CitySearch from '@/components/CitySearch';
 import CurrentWeather from '@/components/CurrentWeather';
 import ForecastSection from '@/components/ForecastSection';
 import HourlyChart from '@/components/HourlyChart';
+import WeeklyGraph from '@/components/WeeklyGraph';
 import LocationHeader from '@/components/LocationHeader';
 import GeolocationPrompt from '@/components/GeolocationPrompt';
 import { 
@@ -43,18 +45,8 @@ const Index = () => {
       if (weatherData.weather && weatherData.weather[0]) {
         setBgGradient(getWeatherBackground(weatherData.weather[0].main));
       }
-
-      toast({
-        title: "Weather Updated",
-        description: `Latest weather data for ${weatherData.name || city} has been loaded`,
-      });
     } catch (error) {
       console.error('Error fetching weather data:', error);
-      toast({
-        title: "Error",
-        description: `Failed to load weather data. Please try again later.`,
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +58,7 @@ const Index = () => {
 
   const handleAllowLocation = async () => {
     setLocationPrompted(true);
+    localStorage.setItem('locationPrompted', 'true');
     try {
       const coords = await getUserCoordinates();
       loadWeatherData("", coords); // Empty city string as we'll get it from coords
@@ -78,39 +71,54 @@ const Index = () => {
 
   const handleDenyLocation = () => {
     setLocationPrompted(true);
+    localStorage.setItem('locationPrompted', 'true');
     // Use the default city
     loadWeatherData(getLastCity());
   };
 
   useEffect(() => {
-    // On first load, prompt for location
-    const checkForLocation = () => {
+    // Check if we've shown the location prompt before
+    const hasPrompted = localStorage.getItem('locationPrompted');
+    
+    if (hasPrompted === 'true') {
+      setLocationPrompted(true);
+      
+      // Check if we already have permission
       if (navigator.permissions) {
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
             // Permission was already granted, use it directly
             handleAllowLocation();
-          } else if (result.state === 'prompt') {
-            // We need to ask for permission
-            setLocationPrompted(false);
           } else {
-            // Permission was denied previously
-            handleDenyLocation();
+            // Use default city
+            loadWeatherData(getLastCity());
           }
+        }).catch(() => {
+          // Handle error
+          loadWeatherData(getLastCity());
         });
       } else {
-        // Browsers that don't support the permissions API
-        setLocationPrompted(false);
+        loadWeatherData(getLastCity());
       }
-    };
-
-    checkForLocation();
+    } else {
+      setLocationPrompted(false);
+    }
   }, []);
 
   if (!locationPrompted) {
     return (
-      <div className={`min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 py-8 px-4 transition-colors duration-1000 flex items-center justify-center`}>
-        <div className="max-w-md w-full mx-auto">
+      <div className={`min-h-screen relative py-8 px-4 transition-colors duration-1000 flex items-center justify-center`}>
+        {/* Nature background image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 
+            alt="Nature background" 
+            className="object-cover w-full h-full opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
+        </div>
+        
+        <div className="max-w-md w-full mx-auto relative z-10">
           <GeolocationPrompt 
             onAllowLocation={handleAllowLocation} 
             onDenyLocation={handleDenyLocation} 
@@ -121,37 +129,40 @@ const Index = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${bgGradient} py-8 px-4 transition-colors duration-1000`}>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
-          <div className="flex-1">
-            {currentWeather && (
-              <LocationHeader 
-                city={currentWeather.name || currentCity} 
-                country={currentWeather?.sys?.country || ''}
-                onSearch={handleSearch}
-              />
-            )}
-          </div>
-          <div className="w-full md:w-64">
-            <CitySearch onSearch={handleSearch} defaultCity={currentCity} />
-          </div>
+    <div className="min-h-screen relative py-6 px-4 transition-colors duration-1000">
+      {/* Nature background image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 
+          alt="Nature background" 
+          className="object-cover w-full h-full opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
+      </div>
+      
+      <div className="max-w-md mx-auto relative z-10">
+        <div className="mb-6">
+          {currentWeather && (
+            <LocationHeader 
+              city={currentWeather.name || currentCity} 
+              country={currentWeather?.sys?.country || ''}
+              onSearch={handleSearch}
+            />
+          )}
         </div>
         
         <CurrentWeather data={currentWeather} isLoading={isLoading} />
         
-        <div className="mt-6">
-          <h3 className="text-lg font-medium text-white/80 mb-2">Hourly Forecast</h3>
+        <div className="mt-4">
           <HourlyChart data={forecast} isLoading={isLoading} />
         </div>
         
-        <div className="mt-6">
-          <h3 className="text-lg font-medium text-white/80 mb-2">5-Day Forecast</h3>
-          <ForecastSection data={forecast} isLoading={isLoading} />
+        <div className="mt-4">
+          <WeeklyGraph data={forecast} isLoading={isLoading} />
         </div>
         
-        <div className="mt-8 text-center text-sm text-white/40">
-          <p>Data provided by Open-Meteo</p>
+        <div className="mt-4 mb-16">
+          <ForecastSection data={forecast} isLoading={isLoading} />
         </div>
       </div>
     </div>

@@ -39,19 +39,19 @@ const CitySearch = ({ onSearch, defaultCity }: CitySearchProps) => {
           <Input
             id="city-search"
             type="text"
-            placeholder="Search for a city..."
+            placeholder="Search city..."
             value={city}
             onChange={handleChange}
-            className="flex-1 bg-white/20 border-none placeholder:text-white/50 text-white focus-visible:ring-white/30 rounded-full h-10"
+            className="flex-1 bg-white/10 border-none placeholder:text-white/50 text-white focus-visible:ring-white/30 rounded-md h-9 text-sm"
           />
           <Button 
             type="button" 
             size="icon" 
             variant="ghost" 
-            className="ml-1 text-white/70 hover:text-white hover:bg-white/10"
+            className="ml-1 text-white/70 hover:text-white hover:bg-white/10 h-8 w-8"
             onClick={toggleSearch}
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </form>
       ) : (
@@ -59,10 +59,10 @@ const CitySearch = ({ onSearch, defaultCity }: CitySearchProps) => {
           type="button" 
           size="icon" 
           variant="ghost" 
-          className="ml-auto text-white/70 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 flex items-center justify-center"
+          className="text-white/70 hover:text-white hover:bg-white/10 rounded-md h-8 w-8 flex items-center justify-center"
           onClick={toggleSearch}
         >
-          <Search className="h-5 w-5" />
+          <Search className="h-4 w-4" />
         </Button>
       )}
     </div>
