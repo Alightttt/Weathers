@@ -1,31 +1,38 @@
 
 import { MapPin } from 'lucide-react';
+import CitySearch from './CitySearch';
 
 interface LocationHeaderProps {
   city: string;
   country: string;
+  onSearch: (city: string) => void;
 }
 
-const LocationHeader = ({ city, country }: LocationHeaderProps) => {
+const LocationHeader = ({ city, country, onSearch }: LocationHeaderProps) => {
   // Format current date
   const today = new Date();
   const formattedDate = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    month: 'short',
+    weekday: 'short'
   });
   
   return (
-    <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-      <div className="flex items-center mb-2 sm:mb-0">
-        <MapPin className="h-5 w-5 mr-2 text-white/80" />
-        <h2 className="text-xl font-medium">
-          {city}, {country}
-        </h2>
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center space-x-1">
+        <div className="bg-white/20 rounded-full p-1.5">
+          <MapPin className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-medium text-white">
+            {city}
+          </h2>
+          <p className="text-xs text-white/70">
+            {formattedDate}
+          </p>
+        </div>
       </div>
-      <p className="text-sm text-white/70">
-        {formattedDate}
-      </p>
+      <CitySearch onSearch={onSearch} defaultCity={city} />
     </div>
   );
 };

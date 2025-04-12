@@ -2,7 +2,7 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface CitySearchProps {
   onSearch: (city: string) => void;
@@ -11,35 +11,61 @@ interface CitySearchProps {
 
 const CitySearch = ({ onSearch, defaultCity }: CitySearchProps) => {
   const [city, setCity] = useState<string>(defaultCity);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (city.trim()) {
       onSearch(city.trim());
+      setIsExpanded(false);
     }
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCity(e.target.value);
   };
+  
+  const toggleSearch = () => {
+    setIsExpanded(!isExpanded);
+    if (!isExpanded) {
+      setTimeout(() => document.getElementById('city-search')?.focus(), 100);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2 w-full max-w-md">
-      <div className="relative flex-1">
-        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Enter city name..."
-          value={city}
-          onChange={handleChange}
-          className="pl-10 bg-black/20 border-white/10 focus:border-white/20 placeholder:text-muted-foreground/70"
-        />
-      </div>
-      <Button type="submit" size="icon" variant="outline" className="bg-black/20 border-white/10 hover:bg-black/30">
-        <Search className="h-4 w-4" />
-        <span className="sr-only">Search</span>
-      </Button>
-    </form>
+    <div className="relative z-20">
+      {isExpanded ? (
+        <form onSubmit={handleSubmit} className="w-full flex items-center animate-fade-in">
+          <Input
+            id="city-search"
+            type="text"
+            placeholder="Search for a city..."
+            value={city}
+            onChange={handleChange}
+            className="flex-1 bg-white/20 border-none placeholder:text-white/50 text-white focus-visible:ring-white/30 rounded-full h-10"
+          />
+          <Button 
+            type="button" 
+            size="icon" 
+            variant="ghost" 
+            className="ml-1 text-white/70 hover:text-white hover:bg-white/10"
+            onClick={toggleSearch}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </form>
+      ) : (
+        <Button 
+          type="button" 
+          size="icon" 
+          variant="ghost" 
+          className="ml-auto text-white/70 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 flex items-center justify-center"
+          onClick={toggleSearch}
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+      )}
+    </div>
   );
 };
 

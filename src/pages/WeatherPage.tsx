@@ -63,9 +63,9 @@ const WeatherPage: React.FC = () => {
 
   if (!locationPrompted) {
     return (
-      <WeatherLayout>
+      <WeatherLayout bgGradient="from-blue-400 to-blue-800">
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-          <div className="max-w-md w-full mx-auto">
+          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 max-w-md w-full mx-auto">
             <LocationPrompt 
               onAllowLocation={handleAllowLocation}
               onDenyLocation={handleDenyLocation}
@@ -80,7 +80,7 @@ const WeatherPage: React.FC = () => {
     <WeatherLayout bgGradient={bgGradient}>
       {currentWeather && (
         <WeatherHeader 
-          city={currentWeather.name} 
+          city={currentWeather.name || currentCity} 
           country={currentWeather.sys?.country || ''} 
           onSearch={handleSearch} 
         />
