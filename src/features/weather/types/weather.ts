@@ -40,7 +40,7 @@ export interface WeatherData {
   name?: string;
   cod?: number;
   
-  // Added fields from Open-Meteo format
+  // Make all Open-Meteo fields optional to match actual usage
   current?: {
     temperature_2m?: number;
     relative_humidity_2m?: number;

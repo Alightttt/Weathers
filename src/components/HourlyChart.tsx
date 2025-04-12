@@ -35,7 +35,8 @@ const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
     );
   }
 
-  const hourlyData = getHourlyForecast(data);
+  // Safely handle potential null/undefined values
+  const hourlyData = data ? getHourlyForecast(data) : [];
   
   if (!hourlyData || hourlyData.length === 0) {
     return (

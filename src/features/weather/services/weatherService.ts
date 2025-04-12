@@ -1,4 +1,5 @@
-import { WeatherData, ForecastData, HourlyForecast, DailyForecast } from '../types/weather';
+
+import { WeatherData, ForecastData } from '../types/weather';
 
 export interface Coordinates {
   latitude: number;
@@ -124,43 +125,22 @@ export const fetchForecast = async (city: string, coords?: Coordinates): Promise
     const data = await response.json();
     
     // Transform the data to match our ForecastData interface
-    const hourly: HourlyForecast[] = data.hourly.time.slice(0, 24).map((time: string, index: number) => ({
-      dt: new Date(time).getTime(),
-      temp: data.hourly.temperature_2m[index],
-      weather: [
-        {
-          main: mapWeatherCodeToCondition(data.hourly.weathercode[index]),
-          description: mapWeatherCodeToDescription(data.hourly.weathercode[index]),
-          icon: mapWeatherCodeToIcon(data.hourly.weathercode[index]),
-        }
-      ],
-      pop: data.hourly.precipitation_probability ? data.hourly.precipitation_probability[index] / 100 : 0,
-    }));
-
-    const daily: DailyForecast[] = data.daily.time.map((time: string, index: number) => ({
-      dt: new Date(time).getTime(),
-      temp: {
-        day: (data.daily.temperature_2m_max[index] + data.daily.temperature_2m_min[index]) / 2,
-        min: data.daily.temperature_2m_min[index],
-        max: data.daily.temperature_2m_max[index],
+    const result: ForecastData = {
+      hourly: {
+        time: data.hourly.time,
+        temperature_2m: data.hourly.temperature_2m,
+        precipitation_probability: data.hourly.precipitation_probability
       },
-      weather: [
-        {
-          main: mapWeatherCodeToCondition(data.daily.weathercode[index]),
-          description: mapWeatherCodeToDescription(data.daily.weathercode[index]),
-          icon: mapWeatherCodeToIcon(data.daily.weathercode[index]),
-        }
-      ],
-      pop: 0, // Open-Meteo doesn't provide precipitation probability for daily forecasts in the free tier
-    }));
-
-    return {
-      hourly,
-      daily,
-      timezone_offset: data.timezone_offset || 0,
-      current: data.current || undefined,
-      current_units: data.current_units || undefined,
+      daily: {
+        time: data.daily.time,
+        weather_code: data.daily.weathercode, 
+        temperature_2m_max: data.daily.temperature_2m_max,
+        temperature_2m_min: data.daily.temperature_2m_min
+      },
+      name: city || "Current Location"
     };
+
+    return result;
   } catch (error) {
     console.error('Error fetching forecast:', error);
     throw error;

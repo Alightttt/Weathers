@@ -1,5 +1,6 @@
 
-import { ForecastData, getDailyForecasts, getDayOfWeek } from '@/lib/weather-utils';
+import { ForecastData } from '@/features/weather/types/weather';
+import { getDailyForecasts, getDayOfWeek } from '@/lib/weather-utils';
 import ForecastCard from './ForecastCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -31,7 +32,8 @@ const ForecastSection = ({ data, isLoading }: ForecastSectionProps) => {
     );
   }
 
-  const dailyForecasts = getDailyForecasts(data);
+  // Safely handle potential null/undefined values
+  const dailyForecasts = data ? getDailyForecasts(data) : [];
 
   if (!dailyForecasts || dailyForecasts.length === 0) {
     return (
