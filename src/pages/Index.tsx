@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import CitySearch from '@/components/CitySearch';
@@ -34,8 +35,8 @@ const Index = () => {
         fetchForecast(city, coords)
       ]);
 
-      setCurrentWeather(weatherData);
-      setForecast(forecastData);
+      setCurrentWeather(weatherData as WeatherData);
+      setForecast(forecastData as ForecastData);
       setCurrentCity(weatherData.name || city);
       saveLastCity(weatherData.name || city);
 

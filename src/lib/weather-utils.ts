@@ -284,14 +284,22 @@ export const getDailyForecasts = (forecastData: ForecastData): any[] => {
 
 // Get hourly forecast for today
 export const getHourlyForecast = (forecastData: ForecastData): any[] => {
+  if (!forecastData || !forecastData.hourly || !forecastData.hourly.time) {
+    return []; // Return empty array if hourly data is missing
+  }
+  
   const hourlyData = [];
   const now = new Date();
-  const today = now.toISOString().split('T')[0];
   
   // Find the starting index for current hour
   const currentHourIndex = forecastData.hourly.time.findIndex(time => 
     new Date(time).getTime() >= now.getTime()
   );
+  
+  // If we couldn't find a valid starting index, return empty array
+  if (currentHourIndex === -1) {
+    return [];
+  }
   
   // Get next 8 hours
   for (let i = currentHourIndex; i < currentHourIndex + 8 && i < forecastData.hourly.time.length; i++) {
@@ -305,12 +313,12 @@ export const getHourlyForecast = (forecastData: ForecastData): any[] => {
         temp: hour.temperature_2m[i],
         temp_min: hour.temperature_2m[i] - 1, // Approximation
         temp_max: hour.temperature_2m[i] + 1, // Approximation
-        humidity: hour.relative_humidity_2m[i]
+        humidity: hour.relative_humidity_2m ? hour.relative_humidity_2m[i] : 50 // Default if missing
       },
       weather: [{
         main: "Weather", // We don't have hourly weather codes
         description: "weather",
-        icon: hour.precipitation_probability[i] > 30 ? "10d" : "01d" // Simple logic for icon
+        icon: hour.precipitation_probability && hour.precipitation_probability[i] > 30 ? "10d" : "01d" // Simple logic for icon
       }],
       wind: {
         speed: 0 // Not available in hourly data

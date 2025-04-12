@@ -1,4 +1,6 @@
-import { ForecastData, getHourlyForecast, getHour } from '@/lib/weather-utils';
+
+import { ForecastData } from '@/features/weather/types/weather';
+import { getHourlyForecast, getHour } from '@/lib/weather-utils';
 import { WeatherIcon } from './WeatherIcons';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,8 +59,9 @@ const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
     }
   };
   
-  const minTemp = Math.min(...visibleData.map(h => h.main.temp));
-  const maxTemp = Math.max(...visibleData.map(h => h.main.temp));
+  // Calculate min/max temperature only if we have data
+  const minTemp = visibleData.length > 0 ? Math.min(...visibleData.map(h => h.main.temp)) : 0;
+  const maxTemp = visibleData.length > 0 ? Math.max(...visibleData.map(h => h.main.temp)) : 0;
   const range = maxTemp - minTemp;
   
   return (
