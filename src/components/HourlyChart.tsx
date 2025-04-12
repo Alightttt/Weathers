@@ -1,4 +1,3 @@
-
 import { ForecastData, getHourlyForecast, getHour } from '@/lib/weather-utils';
 import { WeatherIcon } from './WeatherIcons';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

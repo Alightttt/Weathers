@@ -151,7 +151,9 @@ export interface ForecastData {
   id?: number;
   name?: string;
   cod?: number;
-  daily?: {
+  
+  // Define these properties with their specific types for ForecastData
+  dailyData?: {
     time: string[];
     weather_code: number[];
     temperature_2m_max: number[];
@@ -164,7 +166,7 @@ export interface ForecastData {
     precipitation_probability_max: number[];
     wind_speed_10m_max: number[];
   };
-  hourly?: {
+  hourlyData?: {
     time: string[];
     temperature_2m: number[];
     apparent_temperature: number[];

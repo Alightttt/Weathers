@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import CitySearch from '@/components/CitySearch';
@@ -13,10 +12,9 @@ import {
   getUserCoordinates,
   getLastCity, 
   saveLastCity, 
-  WeatherData, 
-  ForecastData,
   getWeatherBackground
 } from '@/lib/weather-utils';
+import { WeatherData, ForecastData } from '@/features/weather/types/weather';
 
 const Index = () => {
   const { toast } = useToast();
@@ -130,7 +128,7 @@ const Index = () => {
             {currentWeather && (
               <LocationHeader 
                 city={currentWeather.name || currentCity} 
-                country={currentWeather.sys?.country || ''}
+                country={currentWeather?.sys?.country || ''}
               />
             )}
           </div>
@@ -139,16 +137,16 @@ const Index = () => {
           </div>
         </div>
         
-        <CurrentWeather data={currentWeather as WeatherData} isLoading={isLoading} />
+        <CurrentWeather data={currentWeather} isLoading={isLoading} />
         
         <div className="mt-6">
           <h3 className="text-lg font-medium text-white/80 mb-2">Hourly Forecast</h3>
-          <HourlyChart data={forecast as ForecastData} isLoading={isLoading} />
+          <HourlyChart data={forecast} isLoading={isLoading} />
         </div>
         
         <div className="mt-6">
           <h3 className="text-lg font-medium text-white/80 mb-2">5-Day Forecast</h3>
-          <ForecastSection data={forecast as ForecastData} isLoading={isLoading} />
+          <ForecastSection data={forecast} isLoading={isLoading} />
         </div>
         
         <div className="mt-8 text-center text-sm text-white/40">
