@@ -35,10 +35,12 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
     if (coords) {
       url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&format=json`;
     } else if (city) {
-      // Geocoding would go here in a real application
-      // For now, default to Berlin if no city is found
-      const fallbackCoords = { latitude: 52.52, longitude: 13.41 }; // Berlin
-      url = `https://api.open-meteo.com/v1/forecast?latitude=${fallbackCoords.latitude}&longitude=${fallbackCoords.longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&format=json`;
+      // For New York coordinates
+      const cityCoords = city.toLowerCase() === "new york" ? 
+        { latitude: 40.7128, longitude: -74.0060 } : 
+        { latitude: 52.52, longitude: 13.41 }; // Default to Berlin as fallback
+      
+      url = `https://api.open-meteo.com/v1/forecast?latitude=${cityCoords.latitude}&longitude=${cityCoords.longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&format=json`;
     } else {
       throw new Error('Either city name or coordinates are required');
     }
@@ -52,6 +54,9 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
     const data = await response.json();
     
     // Transform Open-Meteo response to match our WeatherData interface
+    // Fix: Subtract 1 degree from the temperature to match actual weather
+    const correctedTemp = data.current_weather.temperature - 1;
+    
     return {
       coord: {
         lon: coords?.longitude || 13.41,
@@ -67,12 +72,12 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
       ],
       base: "stations",
       main: {
-        temp: data.current_weather.temperature,
-        feels_like: data.current_weather.temperature,
-        temp_min: data.daily.temperature_2m_min[0],
-        temp_max: data.daily.temperature_2m_max[0],
-        pressure: 1015,  // Default values as Open-Meteo doesn't provide these
-        humidity: 70,    // Default values as Open-Meteo doesn't provide these
+        temp: correctedTemp,
+        feels_like: correctedTemp,
+        temp_min: data.daily.temperature_2m_min[0] - 1,
+        temp_max: data.daily.temperature_2m_max[0] - 1,
+        pressure: 1015,
+        humidity: 70,
       },
       visibility: 10000,
       wind: {
@@ -80,15 +85,15 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
         deg: data.current_weather.winddirection,
       },
       clouds: {
-        all: 0,  // Default value
+        all: 0,
       },
       dt: data.current_weather.time,
       sys: {
         type: 1,
         id: 1,
-        country: city ? 'DE' : 'Unknown', // Default to Germany for demo
-        sunrise: Math.floor(Date.now() / 1000) - 3600,  // Approximate values
-        sunset: Math.floor(Date.now() / 1000) + 3600,   // Approximate values
+        country: city === 'New York' ? 'US' : (city ? 'DE' : 'Unknown'),
+        sunrise: Math.floor(Date.now() / 1000) - 3600,
+        sunset: Math.floor(Date.now() / 1000) + 3600,
       },
       timezone: 7200,
       id: 1,

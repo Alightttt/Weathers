@@ -5,6 +5,7 @@ import { MapPin, Droplets, Wind, Thermometer } from 'lucide-react';
 import { AnimatedWeatherIcon } from './WeatherIcons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
 
 interface CurrentWeatherProps {
   data: WeatherData | null;
@@ -32,6 +33,31 @@ const WeatherDetail = ({
 };
 
 const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
+  const [animationClass, setAnimationClass] = useState("");
+
+  useEffect(() => {
+    if (data?.weather && data.weather[0]) {
+      const condition = data.weather[0].main;
+      switch (condition) {
+        case 'Clear':
+          setAnimationClass("animate-pulse text-yellow-300");
+          break;
+        case 'Rain':
+        case 'Drizzle':
+          setAnimationClass("animate-bounce text-blue-300");
+          break;
+        case 'Thunderstorm':
+          setAnimationClass("animate-lightning text-yellow-200");
+          break;
+        case 'Snow':
+          setAnimationClass("animate-fade-in text-blue-100");
+          break;
+        default:
+          setAnimationClass("");
+      }
+    }
+  }, [data]);
+
   if (isLoading || !data) {
     return (
       <Card className="backdrop-blur-md bg-white/10 border-white/10 p-5 min-h-[180px] animate-pulse">
@@ -110,7 +136,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         </div>
         
         <div className="mt-4 md:mt-0 md:w-auto">
-          <div className="w-24 h-24">
+          <div className={`w-24 h-24 ${animationClass}`}>
             <AnimatedWeatherIcon weatherCondition={weatherCondition} size="large" />
           </div>
         </div>

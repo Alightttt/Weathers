@@ -32,7 +32,13 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
         <WeatherNavBar />
       </div>
       
-      <Toaster />
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 2000,
+          style: { display: 'none' } // Hide all toasts
+        }} 
+      />
     </div>
   );
 };

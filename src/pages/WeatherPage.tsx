@@ -32,15 +32,15 @@ const WeatherPage: React.FC = () => {
             // Permission was already granted, use it
             handleLocationAccess();
           } else {
-            // Use default city
-            handleSearch(currentCity);
+            // Use default city - New York
+            handleSearch('New York');
           }
         }).catch(() => {
           // Handle error
-          handleSearch(currentCity);
+          handleSearch('New York');
         });
       } else {
-        handleSearch(currentCity);
+        handleSearch('New York');
       }
     } else {
       setLocationPrompted(false);
@@ -56,7 +56,7 @@ const WeatherPage: React.FC = () => {
   const handleDenyLocation = () => {
     setLocationPrompted(true);
     localStorage.setItem('locationPrompted', 'true');
-    handleSearch(currentCity);
+    handleSearch('New York');
   };
 
   if (!locationPrompted) {
@@ -70,6 +70,7 @@ const WeatherPage: React.FC = () => {
             />
           </div>
         </div>
+        <WeatherNavBar />
       </WeatherLayout>
     );
   }
@@ -92,5 +93,8 @@ const WeatherPage: React.FC = () => {
     </WeatherLayout>
   );
 };
+
+// Import WeatherNavBar component at the top of the file
+import WeatherNavBar from '@/components/layout/WeatherNavBar';
 
 export default WeatherPage;
