@@ -3,7 +3,7 @@ import { ForecastData } from '@/features/weather/types/weather';
 import { getHourlyForecast, getHour } from '@/lib/weather-utils';
 import { WeatherIcon } from './WeatherIcons';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
@@ -14,11 +14,30 @@ interface HourlyChartProps {
 
 const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
   const [offset, setOffset] = useState(0);
+  const [temperatureUnit, setTemperatureUnit] = useState<string>(localStorage.getItem('temperatureUnit') || '°C');
   const DISPLAY_COUNT = 5;
+
+  useEffect(() => {
+    // Set temperature unit from settings
+    const savedTempUnit = localStorage.getItem('temperatureUnit');
+    if (savedTempUnit) {
+      setTemperatureUnit(savedTempUnit);
+    }
+  }, []);
+
+  // Convert temperature based on unit
+  const convertTemperature = (temp: number): number => {
+    if (temperatureUnit === '°C') {
+      return temp;
+    } else {
+      // Convert to Fahrenheit
+      return (temp * 9/5) + 32;
+    }
+  };
 
   if (isLoading) {
     return (
-      <Card className="bg-white/10 backdrop-blur-md border-white/10">
+      <Card className="bg-black/40 backdrop-blur-md border-white/10 rounded-3xl shadow-xl">
         <CardHeader className="pb-2 pt-4">
           <Skeleton className="h-5 w-32 bg-white/10" />
         </CardHeader>
@@ -59,9 +78,9 @@ const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
   };
   
   return (
-    <Card className="bg-white/10 backdrop-blur-md border-white/10">
+    <Card className="bg-black/40 backdrop-blur-md border-white/10 rounded-3xl shadow-xl">
       <CardHeader className="pb-2 pt-4 flex flex-row justify-between items-center">
-        <h3 className="text-white/90 font-medium text-sm">Today's Forecast</h3>
+        <h3 className="text-white/90 font-medium">Hourly Forecast</h3>
         <div className="flex space-x-1">
           <button 
             onClick={handlePrevious} 
@@ -82,15 +101,16 @@ const HourlyChart = ({ data, isLoading }: HourlyChartProps) => {
       <CardContent className="pb-4">
         <div className="flex justify-between">
           {visibleData.map((hour, i) => {
-            const temp = Math.round(hour.main.temp);
+            // Convert temperature based on selected unit
+            const temp = Math.round(convertTemperature(hour.main.temp));
             
             return (
-              <div key={i} className="flex flex-col items-center space-y-2">
-                <span className="text-xs text-white/70">{getHour(hour.dt)}</span>
-                <div className="w-10 h-10">
+              <div key={i} className="flex flex-col items-center space-y-3">
+                <span className="text-sm font-medium text-white">{getHour(hour.dt)}</span>
+                <div className="w-12 h-12 bg-blue-500/30 rounded-full flex items-center justify-center">
                   <WeatherIcon weatherCondition={hour.weather[0].main} size="small" />
                 </div>
-                <span className="text-white font-medium">{temp}°</span>
+                <span className="text-white font-bold">{temp}{temperatureUnit}</span>
               </div>
             );
           })}

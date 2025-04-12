@@ -1,7 +1,7 @@
 
 import { WeatherData } from '@/features/weather/types/weather';
 import { degreesToDirection } from '@/lib/weather-utils';
-import { MapPin, Droplets, Wind, Thermometer } from 'lucide-react';
+import { Droplets, Wind, Thermometer, CloudRain, Compass } from 'lucide-react';
 import { AnimatedWeatherIcon } from './WeatherIcons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
@@ -16,7 +16,7 @@ const WeatherDetail = ({
   icon, 
   value, 
   label, 
-  color = "bg-white/10" 
+  color = "bg-blue-500/30" 
 }: { 
   icon: React.ReactNode; 
   value: string; 
@@ -24,7 +24,7 @@ const WeatherDetail = ({
   color?: string;
 }) => {
   return (
-    <div className={`${color} rounded-lg p-3 flex flex-col items-center justify-center min-w-20`}>
+    <div className={`${color} rounded-xl p-3 flex flex-col items-center justify-center min-w-[90px] shadow-lg`}>
       <div className="mb-1 text-white/90">{icon}</div>
       <div className="text-lg font-semibold text-white">{value}</div>
       <div className="text-xs text-white/80">{label}</div>
@@ -34,8 +34,23 @@ const WeatherDetail = ({
 
 const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const [animationClass, setAnimationClass] = useState("");
+  const [temperatureUnit, setTemperatureUnit] = useState<string>(localStorage.getItem('temperatureUnit') || '°C');
+  const [windSpeedUnit, setWindSpeedUnit] = useState<string>(localStorage.getItem('windSpeedUnit') || 'km/h');
 
   useEffect(() => {
+    // Set temperature unit from settings
+    const savedTempUnit = localStorage.getItem('temperatureUnit');
+    if (savedTempUnit) {
+      setTemperatureUnit(savedTempUnit);
+    }
+
+    // Set wind speed unit from settings
+    const savedWindUnit = localStorage.getItem('windSpeedUnit');
+    if (savedWindUnit) {
+      setWindSpeedUnit(savedWindUnit);
+    }
+
+    // Set weather animation based on condition
     if (data?.weather && data.weather[0]) {
       const condition = data.weather[0].main;
       switch (condition) {
@@ -66,6 +81,26 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
       }
     }
   }, [data]);
+
+  // Convert temperature based on unit
+  const convertTemperature = (temp: number): number => {
+    if (temperatureUnit === '°C') {
+      return temp;
+    } else {
+      // Convert to Fahrenheit
+      return (temp * 9/5) + 32;
+    }
+  };
+
+  // Convert wind speed based on unit
+  const convertWindSpeed = (speed: number): number => {
+    if (windSpeedUnit === 'km/h') {
+      return speed;
+    } else {
+      // Convert to mph
+      return speed * 0.621371;
+    }
+  };
 
   if (isLoading || !data) {
     return (
@@ -125,22 +160,26 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     feelsLike = Math.round(data.main.feels_like);
   }
 
+  // Convert temperature and wind speed based on settings
+  const displayTemperature = Math.round(convertTemperature(temperature));
+  const displayFeelsLike = Math.round(convertTemperature(feelsLike));
+  const displayWindSpeed = Math.round(convertWindSpeed(windSpeed));
+
   return (
-    <Card className="backdrop-blur-md bg-white/10 border-white/10 p-4 relative z-20">
+    <Card className="backdrop-blur-md bg-black/40 border-white/10 p-4 relative z-20 rounded-3xl shadow-xl">
       <div className="flex items-center mb-1">
-        <MapPin className="h-4 w-4 text-white mr-1" />
         <span className="text-white/90 text-sm">{data.name}, {data.sys?.country || ''}</span>
       </div>
       
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-6xl font-bold text-white flex items-start">
-            {Math.round(temperature)}
-            <span className="text-2xl mt-2">°C</span>
+          <div className="text-7xl font-bold text-white flex items-start">
+            {displayTemperature}
+            <span className="text-2xl mt-2">{temperatureUnit}</span>
           </div>
-          <div className="text-white/80 capitalize mt-1">{weatherDescription}</div>
-          <div className="text-white/70 text-sm mt-3">
-            Feels like {Math.round(feelsLike)}°C • {windDirection} wind
+          <div className="text-white/90 capitalize mt-1 text-lg">{weatherDescription}</div>
+          <div className="text-white/80 text-sm mt-2">
+            Feels like {displayFeelsLike}{temperatureUnit} • {windDirection} wind
           </div>
         </div>
         
@@ -151,7 +190,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         </div>
       </div>
       
-      <div className="flex gap-2 overflow-x-auto mt-4 pb-2 scrollbar-none">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
         <WeatherDetail 
           icon={<Droplets className="h-5 w-5" />} 
           value={`${humidity}%`} 
@@ -160,14 +199,20 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         
         <WeatherDetail 
           icon={<Wind className="h-5 w-5" />} 
-          value={`${windSpeed} km/h`} 
-          label={`${windDirection}`}
+          value={`${displayWindSpeed} ${windSpeedUnit}`} 
+          label="Wind Speed"
         />
         
         <WeatherDetail 
-          icon={<Thermometer className="h-5 w-5" />} 
-          value={`${Math.round(feelsLike)}°`} 
-          label="Feels Like" 
+          icon={<Compass className="h-5 w-5" />} 
+          value={windDirection} 
+          label="Direction" 
+        />
+        
+        <WeatherDetail 
+          icon={<CloudRain className="h-5 w-5" />} 
+          value={data.rain ? `${data.rain['1h'] || 0}mm` : '0mm'} 
+          label="Rainfall" 
         />
       </div>
     </Card>

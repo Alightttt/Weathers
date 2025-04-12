@@ -5,7 +5,6 @@ import WeatherLayout from '@/components/layout/WeatherLayout';
 import WeatherHeader from '@/features/weather/components/WeatherHeader';
 import WeatherDashboard from '@/features/weather/components/WeatherDashboard';
 import LocationPrompt from '@/features/location/components/LocationPrompt';
-import WeatherNavBar from '@/components/layout/WeatherNavBar';
 
 const WeatherPage: React.FC = () => {
   const {
@@ -63,7 +62,7 @@ const WeatherPage: React.FC = () => {
   if (!locationPrompted) {
     return (
       <WeatherLayout>
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
           <div className="max-w-md w-full mx-auto">
             <LocationPrompt 
               onAllowLocation={handleAllowLocation}
@@ -71,7 +70,6 @@ const WeatherPage: React.FC = () => {
             />
           </div>
         </div>
-        <WeatherNavBar />
       </WeatherLayout>
     );
   }

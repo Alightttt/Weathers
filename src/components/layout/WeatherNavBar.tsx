@@ -18,24 +18,22 @@ const WeatherNavBar: React.FC = () => {
   ];
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white/20 backdrop-blur-xl rounded-t-lg px-2 py-1 flex justify-around items-center">
-          {navItems.map((item, index) => {
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <NavButton
-                key={index}
-                Icon={item.icon}
-                label={item.label}
-                isActive={isActive}
-                onClick={item.action}
-                to={item.path}
-              />
-            );
-          })}
-        </div>
+    <div className="max-w-7xl mx-auto">
+      <div className="bg-white/20 backdrop-blur-xl rounded-t-2xl px-2 py-2 flex justify-around items-center">
+        {navItems.map((item, index) => {
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <NavButton
+              key={index}
+              Icon={item.icon}
+              label={item.label}
+              isActive={isActive}
+              onClick={item.action}
+              to={item.path}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -51,8 +49,8 @@ interface NavButtonProps {
 
 const NavButton: React.FC<NavButtonProps> = ({ Icon, label, isActive, onClick, to }) => {
   const className = cn(
-    "flex flex-col items-center justify-center py-2 px-3 rounded-md transition-colors",
-    isActive ? "text-white" : "text-white/60 hover:text-white"
+    "flex flex-col items-center justify-center p-2 rounded-xl transition-colors",
+    isActive ? "bg-blue-500/80 text-white" : "text-white/60 hover:text-white"
   );
   
   if (onClick) {

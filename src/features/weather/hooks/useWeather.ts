@@ -9,9 +9,10 @@ import {
   getLastCity,
   Coordinates 
 } from '../services/weatherService';
+import { toast } from 'sonner';
 
 export const useWeather = () => {
-  const [currentCity, setCurrentCity] = useState<string>(getLastCity());
+  const [currentCity, setCurrentCity] = useState<string>(getLastCity() || "New York");
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -26,12 +27,12 @@ export const useWeather = () => {
         fetchForecast(city, coords)
       ]);
 
-      // Fix temperature values if needed
+      // Ensure temperature values are correct - no +1 degree discrepancy
       if (weatherData.main && typeof weatherData.main.temp === 'number') {
-        weatherData.main.temp = weatherData.main.temp;
+        weatherData.main.temp = Math.round(weatherData.main.temp);
       }
       if (weatherData.main && typeof weatherData.main.feels_like === 'number') {
-        weatherData.main.feels_like = weatherData.main.feels_like;
+        weatherData.main.feels_like = Math.round(weatherData.main.feels_like);
       }
       
       setCurrentWeather(weatherData);

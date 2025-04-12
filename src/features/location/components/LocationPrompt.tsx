@@ -38,7 +38,7 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
   };
 
   return (
-    <div className="bg-white/20 backdrop-blur-md p-6 rounded-md border border-white/10 shadow-lg">
+    <div className="bg-white/20 backdrop-blur-md p-6 rounded-xl border border-white/10 shadow-lg">
       <div className="mb-4 text-center">
         <MapPin className="h-12 w-12 mx-auto mb-3 text-white" />
         <h2 className="text-xl font-medium mb-2 text-white">Weather Location</h2>
@@ -50,7 +50,7 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
       <div className="space-y-3">
         <Button 
           onClick={handleAllowLocation}
-          className="w-full bg-white/20 hover:bg-white/30 text-white border-0 rounded-md"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white border-0 rounded-xl"
           disabled={isRequesting}
         >
           {isRequesting ? "Getting Location..." : "Allow Location"}
@@ -59,9 +59,9 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
         <Button 
           onClick={onDenyLocation}
           variant="outline"
-          className="w-full border-white/10 bg-transparent text-white hover:bg-white/10 rounded-md"
+          className="w-full border-white/10 bg-transparent text-white hover:bg-white/10 rounded-xl"
         >
-          Use Default Location
+          Use Default Location (New York)
         </Button>
       </div>
     </div>
