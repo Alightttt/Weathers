@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { WeatherData, ForecastData } from '../types/weather';
 import { 
@@ -69,7 +68,6 @@ export const useWeather = () => {
       console.error('Error fetching weather data:', error);
       toast("Error", {
         description: `Failed to load weather data. Please try again later.`,
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

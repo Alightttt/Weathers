@@ -1,5 +1,5 @@
 
-import { WeatherData } from '@/lib/weather-utils';
+import { WeatherData } from '@/features/weather/types/weather';
 import { formatDate, getWeatherTextColor, formatTime, degreesToDirection } from '@/lib/weather-utils';
 import { Wind, Droplets, Clock } from 'lucide-react';
 import { AnimatedWeatherIcon } from './WeatherIcons';
@@ -26,26 +26,42 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const textColorClass = getWeatherTextColor(weatherCondition);
   const today = new Date();
   
-  // Safely access wind direction
-  const windDirection = data.current?.wind_direction_10m ? 
-    degreesToDirection(data.current.wind_direction_10m) : 
-    (data.wind?.deg ? degreesToDirection(data.wind.deg) : 'N/A');
+  // Safely access wind direction - handle both data structures
+  let windDirection = 'N/A';
+  if (data.current?.wind_direction_10m !== undefined) {
+    windDirection = degreesToDirection(data.current.wind_direction_10m);
+  } else if (data.wind?.deg !== undefined) {
+    windDirection = degreesToDirection(data.wind.deg);
+  }
   
+  // Determine time display
   const dataTime = data.current?.time ? 
     formatTime(data.current.time) : 
     formatTime(today.toISOString());
   
-  // Safely access temperature
-  const temperature = data.current?.temperature_2m ?? 
-    (data.main?.temp !== undefined ? Math.round(data.main.temp) : 0);
+  // Safely access temperature - handle both data structures
+  let temperature = 0;
+  if (data.current?.temperature_2m !== undefined) {
+    temperature = data.current.temperature_2m;
+  } else if (data.main?.temp !== undefined) {
+    temperature = Math.round(data.main.temp);
+  }
   
-  // Safely access humidity
-  const humidity = data.current?.relative_humidity_2m ?? 
-    (data.main?.humidity !== undefined ? data.main.humidity : 0);
+  // Safely access humidity - handle both data structures
+  let humidity = 0;
+  if (data.current?.relative_humidity_2m !== undefined) {
+    humidity = data.current.relative_humidity_2m;
+  } else if (data.main?.humidity !== undefined) {
+    humidity = data.main.humidity;
+  }
   
-  // Safely access wind speed
-  const windSpeed = data.current?.wind_speed_10m ?? 
-    (data.wind?.speed !== undefined ? data.wind.speed : 0);
+  // Safely access wind speed - handle both data structures
+  let windSpeed = 0;
+  if (data.current?.wind_speed_10m !== undefined) {
+    windSpeed = data.current.wind_speed_10m;
+  } else if (data.wind?.speed !== undefined) {
+    windSpeed = data.wind.speed;
+  }
 
   return (
     <div className="glass-card p-8 animate-fade-in flex flex-col md:flex-row items-start justify-between gap-6 relative overflow-hidden min-h-[300px]">
