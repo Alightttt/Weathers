@@ -10,8 +10,8 @@ export interface WeatherData {
     description: string;
     icon: string;
   }[];
-  base: string;
-  main: {
+  base?: string;
+  main?: {
     temp: number;
     feels_like: number;
     temp_min: number;
@@ -19,26 +19,26 @@ export interface WeatherData {
     pressure: number;
     humidity: number;
   };
-  visibility: number;
-  wind: {
+  visibility?: number;
+  wind?: {
     speed: number;
     deg: number;
   };
-  clouds: {
+  clouds?: {
     all: number;
   };
-  dt: number;
-  sys: {
+  dt?: number;
+  sys?: {
     type: number;
     id: number;
     country: string;
     sunrise: number;
     sunset: number;
   };
-  timezone: number;
-  id: number;
-  name: string;
-  cod: number;
+  timezone?: number;
+  id?: number;
+  name?: string;
+  cod?: number;
   
   // Added fields from Open-Meteo format
   current?: {
@@ -87,9 +87,9 @@ export interface WeatherData {
 }
 
 export interface ForecastData {
-  hourly: HourlyForecast[];
-  daily: DailyForecast[];
-  timezone_offset: number;
+  hourly?: HourlyForecast[];
+  daily?: DailyForecast[];
+  timezone_offset?: number;
   
   // Added fields to match the WeatherData structure
   current?: {
@@ -115,7 +115,9 @@ export interface ForecastData {
 
 export interface HourlyForecast {
   dt: number;
-  temp: number;
+  main: {
+    temp: number;
+  };
   weather: {
     main: string;
     description: string;
@@ -131,6 +133,8 @@ export interface DailyForecast {
     min: number;
     max: number;
   };
+  temp_min: number;
+  temp_max: number;
   weather: {
     main: string;
     description: string;

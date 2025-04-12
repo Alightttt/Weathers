@@ -25,22 +25,27 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const weatherDescription = data.weather?.[0]?.description || "clear";
   const textColorClass = getWeatherTextColor(weatherCondition);
   const today = new Date();
+  
+  // Safely access wind direction
   const windDirection = data.current?.wind_direction_10m ? 
     degreesToDirection(data.current.wind_direction_10m) : 
-    data.wind?.deg ? degreesToDirection(data.wind.deg) : 'N/A';
+    (data.wind?.deg ? degreesToDirection(data.wind.deg) : 'N/A');
   
   const dataTime = data.current?.time ? 
     formatTime(data.current.time) : 
     formatTime(today.toISOString());
   
+  // Safely access temperature
   const temperature = data.current?.temperature_2m ?? 
-    (typeof data.main?.temp === 'number' ? Math.round(data.main.temp) : 0);
+    (data.main?.temp !== undefined ? Math.round(data.main.temp) : 0);
   
+  // Safely access humidity
   const humidity = data.current?.relative_humidity_2m ?? 
-    data.main?.humidity ?? 0;
+    (data.main?.humidity !== undefined ? data.main.humidity : 0);
   
+  // Safely access wind speed
   const windSpeed = data.current?.wind_speed_10m ?? 
-    data.wind?.speed ?? 0;
+    (data.wind?.speed !== undefined ? data.wind.speed : 0);
 
   return (
     <div className="glass-card p-8 animate-fade-in flex flex-col md:flex-row items-start justify-between gap-6 relative overflow-hidden min-h-[300px]">

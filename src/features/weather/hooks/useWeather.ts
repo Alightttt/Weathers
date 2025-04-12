@@ -62,14 +62,12 @@ export const useWeather = () => {
         }
       }
 
-      toast({
-        title: "Weather Updated",
+      toast("Weather Updated", {
         description: `Latest weather data for ${weatherData.name || city} has been loaded`,
       });
     } catch (error) {
       console.error('Error fetching weather data:', error);
-      toast({
-        title: "Error",
+      toast("Error", {
         description: `Failed to load weather data. Please try again later.`,
         variant: "destructive",
       });
