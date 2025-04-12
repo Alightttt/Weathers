@@ -26,6 +26,11 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
       {/* Content overlay with subtle gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60 z-0"></div>
       
+      {/* Weather animation container - positioned in background but above the image */}
+      <div className="absolute inset-0 flex items-center justify-center z-[1] pointer-events-none opacity-20">
+        <div className="weather-animation-container w-full h-full"></div>
+      </div>
+      
       {/* Main content */}
       <div className="relative z-10 py-6 px-4 md:px-6 max-w-md mx-auto min-h-screen flex flex-col">
         <div className="flex-grow pb-16">{children}</div>
@@ -35,7 +40,7 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
       <Toaster 
         position="top-center"
         toastOptions={{
-          duration: 2000,
+          duration: 0, // Don't show any toasts
           style: { display: 'none' } // Hide all toasts
         }} 
       />

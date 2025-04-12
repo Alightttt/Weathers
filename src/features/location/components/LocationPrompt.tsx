@@ -24,7 +24,7 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
     }
 
     navigator.geolocation.getCurrentPosition(
-      () => {
+      (position) => {
         setIsRequesting(false);
         onAllowLocation();
       },
@@ -33,7 +33,7 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({
         setIsRequesting(false);
         onDenyLocation();
       },
-      { timeout: 10000 }
+      { timeout: 10000, enableHighAccuracy: true }
     );
   };
 

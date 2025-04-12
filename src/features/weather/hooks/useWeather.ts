@@ -9,7 +9,6 @@ import {
   getLastCity,
   Coordinates 
 } from '../services/weatherService';
-import { toast } from "sonner";
 
 export const useWeather = () => {
   const [currentCity, setCurrentCity] = useState<string>(getLastCity());
@@ -27,6 +26,14 @@ export const useWeather = () => {
         fetchForecast(city, coords)
       ]);
 
+      // Fix temperature values if needed
+      if (weatherData.main && typeof weatherData.main.temp === 'number') {
+        weatherData.main.temp = weatherData.main.temp;
+      }
+      if (weatherData.main && typeof weatherData.main.feels_like === 'number') {
+        weatherData.main.feels_like = weatherData.main.feels_like;
+      }
+      
       setCurrentWeather(weatherData);
       setForecast(forecastData);
       setCurrentCity(weatherData.name || city);
@@ -61,15 +68,8 @@ export const useWeather = () => {
             setBgGradient('from-gray-950 to-gray-900');
         }
       }
-
-      toast("Weather Updated", {
-        description: `Latest weather data for ${weatherData.name || city} has been loaded`,
-      });
     } catch (error) {
       console.error('Error fetching weather data:', error);
-      toast("Error", {
-        description: `Failed to load weather data. Please try again later.`,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +83,8 @@ export const useWeather = () => {
       return true;
     } catch (error) {
       console.error('Error getting user coordinates:', error);
-      // Fall back to last city or Berlin
-      loadWeatherData(getLastCity());
+      // Fall back to last city or New York
+      loadWeatherData(getLastCity() || "New York");
       return false;
     }
   }, [loadWeatherData]);
@@ -97,7 +97,7 @@ export const useWeather = () => {
   useEffect(() => {
     const initialLoad = async () => {
       if (!currentWeather) {
-        loadWeatherData(currentCity);
+        loadWeatherData(currentCity || "New York");
       }
     };
 

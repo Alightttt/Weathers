@@ -41,19 +41,28 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
       switch (condition) {
         case 'Clear':
           setAnimationClass("animate-pulse text-yellow-300");
+          document.documentElement.style.setProperty('--weather-animation', 'sunny');
           break;
         case 'Rain':
         case 'Drizzle':
           setAnimationClass("animate-bounce text-blue-300");
+          document.documentElement.style.setProperty('--weather-animation', 'rainy');
           break;
         case 'Thunderstorm':
           setAnimationClass("animate-lightning text-yellow-200");
+          document.documentElement.style.setProperty('--weather-animation', 'stormy');
           break;
         case 'Snow':
           setAnimationClass("animate-fade-in text-blue-100");
+          document.documentElement.style.setProperty('--weather-animation', 'snowy');
+          break;
+        case 'Clouds':
+          setAnimationClass("animate-float text-gray-300");
+          document.documentElement.style.setProperty('--weather-animation', 'cloudy');
           break;
         default:
           setAnimationClass("");
+          document.documentElement.style.setProperty('--weather-animation', 'default');
       }
     }
   }, [data]);
@@ -117,7 +126,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   }
 
   return (
-    <Card className="backdrop-blur-md bg-white/10 border-white/10 p-4">
+    <Card className="backdrop-blur-md bg-white/10 border-white/10 p-4 relative z-20">
       <div className="flex items-center mb-1">
         <MapPin className="h-4 w-4 text-white mr-1" />
         <span className="text-white/90 text-sm">{data.name}, {data.sys?.country || ''}</span>
@@ -136,8 +145,8 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         </div>
         
         <div className="mt-4 md:mt-0 md:w-auto">
-          <div className={`w-24 h-24 ${animationClass}`}>
-            <AnimatedWeatherIcon weatherCondition={weatherCondition} size="large" />
+          <div className={`w-24 h-24 relative z-20 ${animationClass}`}>
+            <AnimatedWeatherIcon weatherCondition={weatherCondition} size="medium" />
           </div>
         </div>
       </div>

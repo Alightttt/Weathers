@@ -5,6 +5,7 @@ import WeatherLayout from '@/components/layout/WeatherLayout';
 import WeatherHeader from '@/features/weather/components/WeatherHeader';
 import WeatherDashboard from '@/features/weather/components/WeatherDashboard';
 import LocationPrompt from '@/features/location/components/LocationPrompt';
+import WeatherNavBar from '@/components/layout/WeatherNavBar';
 
 const WeatherPage: React.FC = () => {
   const {
@@ -45,7 +46,7 @@ const WeatherPage: React.FC = () => {
     } else {
       setLocationPrompted(false);
     }
-  }, [currentCity, handleLocationAccess, handleSearch]);
+  }, [handleLocationAccess, handleSearch]);
 
   const handleAllowLocation = async () => {
     setLocationPrompted(true);
@@ -93,8 +94,5 @@ const WeatherPage: React.FC = () => {
     </WeatherLayout>
   );
 };
-
-// Import WeatherNavBar component at the top of the file
-import WeatherNavBar from '@/components/layout/WeatherNavBar';
 
 export default WeatherPage;

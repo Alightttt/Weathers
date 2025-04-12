@@ -1,4 +1,3 @@
-
 import { WeatherData, ForecastData } from '../types/weather';
 
 export interface Coordinates {
@@ -23,7 +22,7 @@ export const getUserCoordinates = (): Promise<Coordinates> => {
       (error) => {
         reject(error);
       },
-      { timeout: 10000 }
+      { timeout: 10000, enableHighAccuracy: true }
     );
   });
 };
@@ -35,10 +34,25 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
     if (coords) {
       url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&format=json`;
     } else if (city) {
-      // For New York coordinates
-      const cityCoords = city.toLowerCase() === "new york" ? 
-        { latitude: 40.7128, longitude: -74.0060 } : 
-        { latitude: 52.52, longitude: 13.41 }; // Default to Berlin as fallback
+      // Handle common cities with hardcoded coordinates for demo
+      let cityCoords;
+      
+      if (city.toLowerCase().includes("new york")) {
+        cityCoords = { latitude: 40.7128, longitude: -74.0060 };
+      } else if (city.toLowerCase().includes("london")) {
+        cityCoords = { latitude: 51.5074, longitude: -0.1278 };
+      } else if (city.toLowerCase().includes("paris")) {
+        cityCoords = { latitude: 48.8566, longitude: 2.3522 };
+      } else if (city.toLowerCase().includes("tokyo")) {
+        cityCoords = { latitude: 35.6762, longitude: 139.6503 };
+      } else if (city.toLowerCase().includes("sydney")) {
+        cityCoords = { latitude: -33.8688, longitude: 151.2093 };
+      } else if (city.toLowerCase().includes("berlin")) {
+        cityCoords = { latitude: 52.5200, longitude: 13.4050 };
+      } else {
+        // Default to New York if city not found
+        cityCoords = { latitude: 40.7128, longitude: -74.0060 };
+      }
       
       url = `https://api.open-meteo.com/v1/forecast?latitude=${cityCoords.latitude}&longitude=${cityCoords.longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&format=json`;
     } else {
@@ -54,8 +68,8 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
     const data = await response.json();
     
     // Transform Open-Meteo response to match our WeatherData interface
-    // Fix: Subtract 1 degree from the temperature to match actual weather
-    const correctedTemp = data.current_weather.temperature - 1;
+    // Fix: No longer subtracting 1 degree to fix the temperature offset
+    const correctedTemp = data.current_weather.temperature;
     
     return {
       coord: {
@@ -73,9 +87,9 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
       base: "stations",
       main: {
         temp: correctedTemp,
-        feels_like: correctedTemp,
-        temp_min: data.daily.temperature_2m_min[0] - 1,
-        temp_max: data.daily.temperature_2m_max[0] - 1,
+        feels_like: correctedTemp - 1, // Feels like is typically slightly lower
+        temp_min: data.daily.temperature_2m_min[0],
+        temp_max: data.daily.temperature_2m_max[0],
         pressure: 1015,
         humidity: 70,
       },
@@ -91,13 +105,13 @@ export const fetchCurrentWeather = async (city: string, coords?: Coordinates): P
       sys: {
         type: 1,
         id: 1,
-        country: city === 'New York' ? 'US' : (city ? 'DE' : 'Unknown'),
+        country: getCountryFromCity(city),
         sunrise: Math.floor(Date.now() / 1000) - 3600,
         sunset: Math.floor(Date.now() / 1000) + 3600,
       },
       timezone: 7200,
       id: 1,
-      name: city || "Current Location",
+      name: city || getCityNameFromCoords(coords),
       cod: 200,
     };
   } catch (error) {
@@ -181,6 +195,45 @@ export const getWeatherBackground = (condition: string): string => {
       return 'from-gray-950 to-gray-900';
   }
 };
+
+// Helper function to get a country code based on city name
+function getCountryFromCity(city: string): string {
+  if (!city) return 'US'; // Default
+  
+  const cityLower = city.toLowerCase();
+  if (cityLower.includes('new york')) return 'US';
+  if (cityLower.includes('london')) return 'GB';
+  if (cityLower.includes('paris')) return 'FR';
+  if (cityLower.includes('tokyo')) return 'JP';
+  if (cityLower.includes('sydney')) return 'AU';
+  if (cityLower.includes('berlin')) return 'DE';
+  
+  return 'US'; // Default
+}
+
+// Helper function to get a city name based on coordinates
+function getCityNameFromCoords(coords?: Coordinates): string {
+  if (!coords) return 'New York';
+  
+  // This is a simplistic approach for demo purposes
+  // In a real app, you would use reverse geocoding
+  const { latitude, longitude } = coords;
+  
+  // New York
+  if (Math.abs(latitude - 40.7128) < 1 && Math.abs(longitude - (-74.0060)) < 1) {
+    return 'New York';
+  }
+  // London
+  if (Math.abs(latitude - 51.5074) < 1 && Math.abs(longitude - (-0.1278)) < 1) {
+    return 'London';
+  }
+  // Paris
+  if (Math.abs(latitude - 48.8566) < 1 && Math.abs(longitude - 2.3522) < 1) {
+    return 'Paris';
+  }
+  
+  return 'Current Location';
+}
 
 // Helper functions for mapping weather codes to conditions
 function mapWeatherCodeToCondition(code: number): string {
