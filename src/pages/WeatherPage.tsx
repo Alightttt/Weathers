@@ -28,10 +28,9 @@ const WeatherPage: React.FC = () => {
           setLocationStatus("Getting weather for your location...");
           handleLocationAccess().then(success => {
             if (success) {
-              setLocationStatus("Using your location");
-              toast.success("Weather updated using your location");
+              setLocationStatus("");
             } else {
-              setLocationStatus("Could not access location. Using New York");
+              setLocationStatus("");
               handleSearch('New York');
             }
           });
@@ -42,31 +41,29 @@ const WeatherPage: React.FC = () => {
               setLocationStatus("Getting weather for your location...");
               handleLocationAccess().then(success => {
                 if (success) {
-                  setLocationStatus("Using your location");
-                  toast.success("Weather updated using your location");
+                  setLocationStatus("");
                 }
               });
             },
             () => {
               // User denied permission when prompted
-              setLocationStatus("Using default location: New York");
+              setLocationStatus("");
               handleSearch('New York');
-              toast.info("Using default location: New York. Allow location access for local weather.");
             }
           );
         } else {
           // Permission denied
-          setLocationStatus("Using default location: New York");
+          setLocationStatus("");
           handleSearch('New York');
         }
       }).catch(() => {
         // Error checking permission
-        setLocationStatus("Using default location: New York");
+        setLocationStatus("");
         handleSearch('New York');
       });
     } else {
       // Geolocation not supported
-      setLocationStatus("Using default location: New York");
+      setLocationStatus("");
       handleSearch('New York');
     }
   }, [handleLocationAccess, handleSearch]);

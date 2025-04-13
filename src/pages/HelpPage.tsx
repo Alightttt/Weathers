@@ -1,7 +1,7 @@
 
 import React from 'react';
 import WeatherLayout from '@/components/layout/WeatherLayout';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Github } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HelpPage: React.FC = () => {
@@ -32,8 +32,7 @@ const HelpPage: React.FC = () => {
               <li>Allow location access to see weather at your current location</li>
               <li>Search for any city using the search icon</li>
               <li>Switch between different units in settings</li>
-              <li>View hourly and 30-day forecasts</li>
-              <li>Check the interactive weather map</li>
+              <li>View hourly and weekly forecasts</li>
             </ul>
           </div>
           
@@ -65,17 +64,18 @@ const HelpPage: React.FC = () => {
           </div>
           
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-5">
-            <h3 className="text-white font-medium mb-3">Contact Support</h3>
-            <p className="text-white/80 text-sm">
-              Need more help? Reach out to us on Twitter:
+            <h3 className="text-white font-medium mb-3">Contact & Source Code</h3>
+            <p className="text-white/80 text-sm mb-3">
+              Find the source code for this project on GitHub:
             </p>
             <a 
-              href="https://x.com/alightcodess" 
+              href="https://github.com/Alightttt" 
               target="_blank" 
               rel="noopener noreferrer"
               className="mt-3 bg-blue-500/80 hover:bg-blue-600/80 py-2 px-4 rounded-xl text-white flex items-center justify-center w-full"
             >
-              Contact on Twitter (X)
+              <Github className="mr-2 h-4 w-4" />
+              GitHub Repository
             </a>
           </div>
         </div>

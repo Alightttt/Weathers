@@ -21,12 +21,13 @@ const WeatherHeader: React.FC<WeatherHeaderProps> = ({ city, country, onSearch }
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center">
-        <div className="bg-white/10 rounded-md p-1 mr-2">
+        <div className="bg-white/20 rounded-full p-1.5 mr-2">
           <MapPin className="h-4 w-4 text-white" />
         </div>
         <div>
           <h2 className="text-lg font-medium text-white">
             {city}
+            {country ? `, ${country}` : ''}
           </h2>
           <p className="text-xs text-white/70">
             {formattedDate}

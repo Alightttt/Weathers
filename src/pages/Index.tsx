@@ -107,8 +107,8 @@ const Index = () => {
 
   if (!locationPrompted) {
     return (
-      <div className={`min-h-screen relative py-8 px-4 transition-colors duration-1000 flex items-center justify-center`}>
-        {/* Nature background image */}
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-b from-gray-900 to-gray-800">
+        {/* Background image */}
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 

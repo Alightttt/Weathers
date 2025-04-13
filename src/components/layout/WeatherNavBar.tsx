@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, Search, Map, Settings } from 'lucide-react';
+import { Home, Search, Settings, HelpCircle } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ const WeatherNavBar: React.FC = () => {
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
     { icon: Search, label: 'Search', path: '/search' },
-    { icon: Map, label: 'Map', path: '/map' },
+    { icon: HelpCircle, label: 'Help', path: '/help' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
   

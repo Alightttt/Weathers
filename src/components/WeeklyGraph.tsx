@@ -5,7 +5,6 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useState, useEffect } from 'react';
 import { WeatherIcon } from './WeatherIcons';
-import { Sun, Cloud, CloudRain } from 'lucide-react';
 
 interface WeeklyGraphProps {
   data: ForecastData | null;
@@ -67,7 +66,7 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
   // Format data for the chart with temperature conversion
   const chartData = dailyForecasts.map(day => ({
     name: new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }),
-    max: Math.round(convertTemperature(day.temp_max)),
+    temp: Math.round(convertTemperature(day.temp_max)),
     min: Math.round(convertTemperature(day.temp_min)),
     icon: day.weather.icon,
     condition: day.weather.main
@@ -79,22 +78,13 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
         <h3 className="text-white/90 font-medium">Weekly Forecast</h3>
       </CardHeader>
       <CardContent className="pb-4">
-        <div className="h-44 w-full mb-6">
+        <div className="h-44 w-full mb-6 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/20 to-transparent rounded-xl"></div>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
               margin={{ top: 20, right: 15, left: 15, bottom: 5 }}
             >
-              <defs>
-                <linearGradient id="maxTempGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#FFD700" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#FFD700" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="minTempGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#48CAE4" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#48CAE4" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
               <XAxis 
                 dataKey="name" 
                 tick={{ fill: '#fff', opacity: 0.7, fontSize: 12 }}
@@ -113,33 +103,25 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
               />
               <Line 
                 type="monotone" 
-                dataKey="max" 
+                dataKey="temp" 
                 stroke="#FFD700" 
                 strokeWidth={3}
                 dot={{ stroke: '#FFD700', strokeWidth: 2, r: 4, fill: '#FFD700' }}
                 activeDot={{ stroke: '#FFD700', strokeWidth: 2, r: 6, fill: '#FFD700' }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="min" 
-                stroke="#48CAE4" 
-                strokeWidth={3}
-                dot={{ stroke: '#48CAE4', strokeWidth: 2, r: 4, fill: '#48CAE4' }}
-                activeDot={{ stroke: '#48CAE4', strokeWidth: 2, r: 6, fill: '#48CAE4' }}
-              />
             </LineChart>
           </ResponsiveContainer>
         </div>
         
-        <div className="grid grid-cols-7 gap-2 mt-2">
+        <div className="grid grid-cols-7 gap-2">
           {chartData.slice(0, 7).map((day, i) => (
-            <div key={i} className="flex flex-col items-center bg-black/30 rounded-xl p-3">
-              <span className="text-xs text-white/70 mb-1">{day.name}</span>
+            <div key={i} className="flex flex-col items-center bg-black/40 rounded-xl p-3">
+              <span className="text-xs text-white/70">{day.name}</span>
               <div className="my-2">
                 <WeatherIcon weatherCondition={day.condition} size="medium" />
               </div>
               <div className="text-center">
-                <div className="text-amber-400 font-bold">{day.max}°</div>
+                <div className="text-amber-400 font-bold">{day.temp}°</div>
                 <div className="text-blue-300 text-xs">{day.min}°</div>
               </div>
             </div>

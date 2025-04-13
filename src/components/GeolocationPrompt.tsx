@@ -1,8 +1,8 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MapPin } from 'lucide-react';
 
-// This component is no longer used as we're directly requesting location in the WeatherPage
 interface GeolocationPromptProps {
   onAllowLocation: () => void;
   onDenyLocation: () => void;
@@ -10,11 +10,42 @@ interface GeolocationPromptProps {
 
 const GeolocationPrompt = ({ onAllowLocation, onDenyLocation }: GeolocationPromptProps) => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const [status, setStatus] = useState<string>("");
+
+  const handleAllowLocation = () => {
+    setIsRequesting(true);
+    onAllowLocation();
+  };
 
   return (
-    <div>
-      {/* This component is no longer used */}
+    <div className="text-center p-6 bg-black/30 backdrop-blur-md rounded-3xl border border-white/10">
+      <div className="flex justify-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-blue-500/30 flex items-center justify-center">
+          <MapPin className="h-8 w-8 text-white" />
+        </div>
+      </div>
+      
+      <h2 className="text-xl font-semibold text-white mb-2">Location Access</h2>
+      <p className="text-white/80 mb-6">
+        Allow access to your location for accurate weather information for your area.
+      </p>
+      
+      <div className="space-y-3">
+        <Button 
+          onClick={handleAllowLocation}
+          disabled={isRequesting}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+        >
+          {isRequesting ? "Getting location..." : "Allow location access"}
+        </Button>
+        
+        <Button 
+          onClick={onDenyLocation}
+          variant="outline" 
+          className="w-full border-white/20 text-white hover:bg-white/10"
+        >
+          Use default location
+        </Button>
+      </div>
     </div>
   );
 };

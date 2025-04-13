@@ -37,8 +37,12 @@ export const useWeather = () => {
       
       setCurrentWeather(weatherData);
       setForecast(forecastData);
-      setCurrentCity(weatherData.name || city);
-      saveLastCity(weatherData.name || city);
+      
+      // Update city name from the weather data
+      if (weatherData.name) {
+        setCurrentCity(weatherData.name);
+        saveLastCity(weatherData.name);
+      }
 
       // Set background gradient based on weather condition
       if (weatherData.weather && weatherData.weather[0]) {
