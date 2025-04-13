@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -178,8 +179,16 @@ body {
 }
 
 .animate-sunny {
-  animation: sunny-rotate 10s linear infinite;
-  color: #FFD700;
+  animation: sunny-rotate 20s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
 }
 
 @keyframes clouds-float {
@@ -202,11 +211,15 @@ body {
   animation: rain-fall 1.5s linear infinite;
 }
 
+.clip-lightning {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 40%, 50% 50%, 100% 100%, 0% 40%, 50% 0%);
+}
+
 .temperature-text {
   font-size: 5rem;
   font-weight: 600;
   line-height: 1;
-  color: white;
+  color: black;
 }
 
 .condition-text {
@@ -223,11 +236,6 @@ body {
   .temperature-text {
     font-size: 4rem;
   }
-}
-
-.dark-theme {
-  background-color: #121212;
-  color: #ffffff;
 }
 
 /* Mobile-specific styles */

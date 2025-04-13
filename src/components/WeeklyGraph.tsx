@@ -33,7 +33,7 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
 
   if (!data || isLoading) {
     return (
-      <Card className="bg-[#FFDE5F] rounded-3xl shadow-xl p-4 my-6">
+      <Card className="bg-white/10 backdrop-blur-md rounded-3xl shadow-xl p-4 my-6 border border-white/10">
         <CardHeader className="pb-2 pt-4">
           <h3 className="text-black font-medium">Daily Forecast</h3>
         </CardHeader>
@@ -51,7 +51,7 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
   
   if (!dailyForecasts || dailyForecasts.length === 0) {
     return (
-      <Card className="bg-[#FFDE5F] rounded-3xl shadow-xl p-4 my-6">
+      <Card className="bg-white/10 backdrop-blur-md rounded-3xl shadow-xl p-4 my-6 border border-white/10">
         <CardHeader className="pb-2 pt-4">
           <h3 className="text-black font-medium">Daily Forecast</h3>
         </CardHeader>
@@ -65,37 +65,44 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
   }
 
   // Format data for the chart with temperature conversion
-  const chartData = dailyForecasts.map((day, index) => ({
-    name: new Date(day.dt * 1000).toLocaleDateString('en-US', { hour: '2-digit' }).split(' ')[1],
-    temp: Math.round(convertTemperature(day.temp_max)),
-    min: Math.round(convertTemperature(day.temp_min)),
-    icon: day.weather.icon,
-    condition: day.weather.main,
-    isNow: index === 0
-  }));
+  const chartData = dailyForecasts.map((day, index) => {
+    const dayOfWeek = new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' });
+    return {
+      name: index === 0 ? "NOW" : dayOfWeek,
+      temp: Math.round(convertTemperature(day.temp_max)),
+      min: Math.round(convertTemperature(day.temp_min)),
+      icon: day.weather.icon,
+      condition: day.weather.main,
+      isNow: index === 0
+    };
+  });
 
-  // Calculate humidity, wind speed, and precipitation chance from data
-  const currentData = data.current || {};
-  const humidity = currentData.relative_humidity_2m || 34;
-  const windSpeed = currentData.wind_speed_10m || 26;
+  // Calculate averages for display
+  const humidity = data.current?.relative_humidity_2m || 
+                  (data.main?.humidity !== undefined ? data.main.humidity : 34);
+  const windSpeed = data.current?.wind_speed_10m || 
+                   (data.wind?.speed !== undefined ? Math.round(data.wind.speed) : 26);
   const precipProb = data.hourly?.precipitation_probability?.[0] || 20;
 
   return (
     <div className="space-y-6">
-      <Card className="bg-[#FFDE5F] rounded-3xl shadow-xl p-6">
+      <Card className="bg-white/10 backdrop-blur-md rounded-3xl shadow-xl p-6 border border-white/10">
         <div className="flex justify-center">
           <div className="grid grid-cols-3 gap-16">
             <div className="flex flex-col items-center">
-              <Droplets className="h-5 w-5 text-black mb-1" />
+              <Droplets className="h-5 w-5 text-blue-500 mb-1" />
               <span className="text-lg font-medium text-black">{humidity}%</span>
+              <span className="text-xs text-black/60">Humidity</span>
             </div>
             <div className="flex flex-col items-center">
-              <Wind className="h-5 w-5 text-black mb-1" />
-              <span className="text-lg font-medium text-black">{windSpeed}KM/H</span>
+              <Wind className="h-5 w-5 text-gray-700 mb-1" />
+              <span className="text-lg font-medium text-black">{windSpeed}km/h</span>
+              <span className="text-xs text-black/60">Wind</span>
             </div>
             <div className="flex flex-col items-center">
-              <Thermometer className="h-5 w-5 text-black mb-1" />
+              <Thermometer className="h-5 w-5 text-red-500 mb-1" />
               <span className="text-lg font-medium text-black">{precipProb}%</span>
+              <span className="text-xs text-black/60">Rain</span>
             </div>
           </div>
         </div>
@@ -119,14 +126,17 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
                   stroke="#000" 
                   strokeWidth={2}
                   dot={false}
+                  animationDuration={1500}
                 />
-                <ReferenceDot
-                  x="NOW"
-                  y={chartData[0]?.temp || 0}
-                  r={5}
-                  fill="#000"
-                  stroke="none"
-                />
+                {chartData[0] && (
+                  <ReferenceDot
+                    x={chartData[0].name}
+                    y={chartData[0].temp}
+                    r={5}
+                    fill="#000"
+                    stroke="none"
+                  />
+                )}
                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
@@ -143,19 +153,16 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
             </ResponsiveContainer>
           </div>
 
-          <div className="flex justify-between mt-2">
-            <div className="text-center">
-              <div className="font-medium text-black">6 AM</div>
-              <div className="text-lg font-bold text-black">38°</div>
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-black">NOW</div>
-              <div className="text-lg font-bold text-black">{chartData[0]?.temp}°</div>
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-black">6 PM</div>
-              <div className="text-lg font-bold text-black">38°</div>
-            </div>
+          <div className="flex justify-between mt-4">
+            {chartData.slice(0, 3).map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="font-medium text-black">{item.name}</div>
+                <div className="text-lg font-bold text-black">{item.temp}°</div>
+                <div className="flex justify-center">
+                  <WeatherIcon weatherCondition={item.condition} size="small" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </Card>

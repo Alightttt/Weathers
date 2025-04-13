@@ -1,78 +1,58 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Settings, Home, HelpCircle, Twitter, Github } from 'lucide-react';
-import { Button } from '../ui/button';
+import {
+  Home,
+  Search,
+  Map,
+  Settings,
+  HelpCircle,
+  Info
+} from 'lucide-react';
 
 const WeatherNavBar: React.FC = () => {
   const location = useLocation();
   
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
   
   const navItems = [
-    { 
-      path: '/', 
-      icon: <Home className="w-5 h-5" />, 
-      label: 'Home', 
-      isActive: isActive('/') 
-    },
-    { 
-      path: '/settings', 
-      icon: <Settings className="w-5 h-5" />, 
-      label: 'Settings', 
-      isActive: isActive('/settings') 
-    },
-    { 
-      path: '/about', 
-      icon: <Github className="w-5 h-5" />, 
-      label: 'About', 
-      isActive: isActive('/about'),
-      href: 'https://github.com/Alightttt'
-    },
-    { 
-      path: '/help', 
-      icon: <Twitter className="w-5 h-5" />, 
-      label: 'Help',
-      isActive: isActive('/help')
-    }
+    { path: '/', icon: Home, label: 'Home' },
+    { path: '/search', icon: Search, label: 'Search' },
+    { path: '/map', icon: Map, label: 'Map' },
+    { path: '/settings', icon: Settings, label: 'Settings' },
+    { path: '/help', icon: HelpCircle, label: 'Help' },
+    { path: '/about', icon: Info, label: 'About' }
   ];
   
   return (
-    <div className="bg-white/80 backdrop-blur-md py-4 px-6 border-t border-gray-200">
+    <nav className="bg-[#FFDE5F] py-3 px-4 rounded-t-3xl border-t border-black/10 shadow-lg">
       <div className="max-w-md mx-auto">
-        <div className="flex justify-around items-center">
-          {navItems.map((item) => (
-            <React.Fragment key={item.path}>
-              {item.href ? (
-                <a 
-                  href={item.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center text-sm font-medium text-gray-500 hover:text-black"
+        <ul className="flex justify-between">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex flex-col items-center p-2 rounded-xl ${
+                    active ? 'bg-black/10' : 'hover:bg-black/5'
+                  }`}
                 >
-                  {React.cloneElement(item.icon, { 
-                    className: `w-5 h-5 ${item.isActive ? 'text-blue-500' : 'text-gray-500'}`
-                  })}
-                  <span className="mt-1 text-xs">{item.label}</span>
-                </a>
-              ) : (
-                <Link 
-                  to={item.path} 
-                  className="flex flex-col items-center text-sm font-medium text-gray-500 hover:text-black"
-                >
-                  {React.cloneElement(item.icon, { 
-                    className: `w-5 h-5 ${item.isActive ? 'text-blue-500' : 'text-gray-500'}`
-                  })}
-                  <span className="mt-1 text-xs">{item.label}</span>
+                  <Icon
+                    size={20}
+                    className={active ? 'text-black' : 'text-black/60'}
+                  />
+                  <span className={`text-xs mt-1 ${active ? 'text-black' : 'text-black/60'}`}>
+                    {item.label}
+                  </span>
                 </Link>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
+    </nav>
   );
 };
 
