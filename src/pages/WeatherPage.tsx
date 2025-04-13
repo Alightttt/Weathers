@@ -17,6 +17,7 @@ const WeatherPage: React.FC = () => {
     handleLocationAccess
   } = useWeather();
   const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
+  const [locationStatus, setLocationStatus] = useState<string>("");
 
   useEffect(() => {
     // Check if we've shown the location prompt before
@@ -30,16 +31,20 @@ const WeatherPage: React.FC = () => {
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
             // Permission was already granted, use it
+            setLocationStatus("Using your location");
             handleLocationAccess();
           } else {
             // Use default city - New York
+            setLocationStatus("Using default location: New York");
             handleSearch('New York');
           }
         }).catch(() => {
           // Handle error
+          setLocationStatus("Using default location: New York");
           handleSearch('New York');
         });
       } else {
+        setLocationStatus("Using default location: New York");
         handleSearch('New York');
       }
     } else {
@@ -50,18 +55,25 @@ const WeatherPage: React.FC = () => {
   const handleAllowLocation = async () => {
     setLocationPrompted(true);
     localStorage.setItem('locationPrompted', 'true');
-    await handleLocationAccess();
+    setLocationStatus("Getting weather for your location...");
+    const success = await handleLocationAccess();
+    if (success) {
+      setLocationStatus("Using your location");
+    } else {
+      setLocationStatus("Could not access location. Using New York");
+    }
   };
 
   const handleDenyLocation = () => {
     setLocationPrompted(true);
     localStorage.setItem('locationPrompted', 'true');
+    setLocationStatus("Using default location: New York");
     handleSearch('New York');
   };
 
   if (!locationPrompted) {
     return (
-      <WeatherLayout>
+      <WeatherLayout showFooter={true}>
         <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
           <div className="max-w-md w-full mx-auto">
             <LocationPrompt 
@@ -75,13 +87,19 @@ const WeatherPage: React.FC = () => {
   }
 
   return (
-    <WeatherLayout bgGradient={bgGradient}>
+    <WeatherLayout bgGradient={bgGradient} showFooter={true}>
       {currentWeather && (
         <WeatherHeader 
           city={currentWeather.name || currentCity} 
           country={currentWeather.sys?.country || ''} 
           onSearch={handleSearch} 
         />
+      )}
+
+      {locationStatus && (
+        <div className="mb-4 text-sm text-white/70 px-2">
+          {locationStatus}
+        </div>
       )}
 
       <WeatherDashboard

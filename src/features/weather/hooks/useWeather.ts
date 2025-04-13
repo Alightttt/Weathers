@@ -9,7 +9,6 @@ import {
   getLastCity,
   Coordinates 
 } from '../services/weatherService';
-import { toast } from 'sonner';
 
 export const useWeather = () => {
   const [currentCity, setCurrentCity] = useState<string>(getLastCity() || "New York");
@@ -91,6 +90,7 @@ export const useWeather = () => {
   }, [loadWeatherData]);
 
   const handleSearch = useCallback((city: string) => {
+    if (!city.trim()) return;
     loadWeatherData(city);
   }, [loadWeatherData]);
 

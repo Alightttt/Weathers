@@ -6,11 +6,13 @@ import WeatherNavBar from './WeatherNavBar';
 interface WeatherLayoutProps {
   children: React.ReactNode;
   bgGradient?: string;
+  showFooter?: boolean;
 }
 
 const WeatherLayout: React.FC<WeatherLayoutProps> = ({ 
   children, 
-  bgGradient = "from-blue-400/70 to-blue-600/70" 
+  bgGradient = "from-blue-400/70 to-blue-600/70",
+  showFooter = true
 }) => {
   // Add weather animations to the background based on the current condition
   useEffect(() => {
@@ -47,9 +49,11 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
       </div>
       
       {/* Fixed footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <WeatherNavBar />
-      </div>
+      {showFooter && (
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <WeatherNavBar />
+        </div>
+      )}
       
       <Toaster position="top-center" />
     </div>

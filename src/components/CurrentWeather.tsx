@@ -1,8 +1,8 @@
+
 import { WeatherData } from '@/features/weather/types/weather';
 import { degreesToDirection } from '@/lib/weather-utils';
 import { Droplets, Wind, Thermometer, CloudRain, Compass } from 'lucide-react';
 import { AnimatedWeatherIcon } from './WeatherIcons';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 
@@ -94,16 +94,11 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     }
   };
 
-  if (isLoading || !data) {
+  if (!data) {
     return (
-      <Card className="backdrop-blur-md bg-white/10 border-white/10 p-5 min-h-[180px] animate-pulse">
-        <div className="flex flex-col items-center md:items-start md:flex-row md:justify-between">
-          <div className="space-y-4 mb-6 md:mb-0">
-            <Skeleton className="h-8 w-48 bg-white/10 rounded-md" />
-            <Skeleton className="h-20 w-32 bg-white/10 rounded-md" />
-            <Skeleton className="h-5 w-64 bg-white/10 rounded-md" />
-          </div>
-          <Skeleton className="h-24 w-24 rounded-full bg-white/10" />
+      <Card className="backdrop-blur-md bg-black/40 border-white/10 p-4 relative z-20 rounded-3xl shadow-xl">
+        <div className="text-center text-white/70">
+          Waiting for weather data...
         </div>
       </Card>
     );
