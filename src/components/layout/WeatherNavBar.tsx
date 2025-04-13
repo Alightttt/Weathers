@@ -1,58 +1,68 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  Home,
-  Search,
-  Map,
-  Settings,
-  HelpCircle,
-  Info
-} from 'lucide-react';
+import { Home, Search, Settings, HelpCircle } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const WeatherNavBar: React.FC = () => {
   const location = useLocation();
   
-  const isActive = (path: string) => location.pathname === path;
-  
   const navItems = [
-    { path: '/', icon: Home, label: 'Home' },
-    { path: '/search', icon: Search, label: 'Search' },
-    { path: '/map', icon: Map, label: 'Map' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
-    { path: '/help', icon: HelpCircle, label: 'Help' },
-    { path: '/about', icon: Info, label: 'About' }
+    { icon: Home, label: 'Home', path: '/' },
+    { icon: Search, label: 'Search', path: '/search' },
+    { icon: HelpCircle, label: 'Help', path: '/help' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
   
   return (
-    <nav className="bg-[#FFDE5F] py-3 px-4 rounded-t-3xl border-t border-black/10 shadow-lg">
-      <div className="max-w-md mx-auto">
-        <ul className="flex justify-between">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.path);
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex flex-col items-center p-2 rounded-xl ${
-                    active ? 'bg-black/10' : 'hover:bg-black/5'
-                  }`}
-                >
-                  <Icon
-                    size={20}
-                    className={active ? 'text-black' : 'text-black/60'}
-                  />
-                  <span className={`text-xs mt-1 ${active ? 'text-black' : 'text-black/60'}`}>
-                    {item.label}
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+    <div className="max-w-7xl mx-auto">
+      <div className="bg-white/20 backdrop-blur-xl rounded-t-2xl px-2 py-2 flex justify-around items-center">
+        {navItems.map((item, index) => {
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <NavButton
+              key={index}
+              Icon={item.icon}
+              label={item.label}
+              isActive={isActive}
+              to={item.path}
+            />
+          );
+        })}
       </div>
-    </nav>
+    </div>
+  );
+};
+
+interface NavButtonProps {
+  Icon: React.FC<{ className?: string }>;
+  label: string;
+  isActive: boolean;
+  onClick?: () => void;
+  to: string;
+}
+
+const NavButton: React.FC<NavButtonProps> = ({ Icon, label, isActive, onClick, to }) => {
+  const className = cn(
+    "flex flex-col items-center justify-center p-2 rounded-xl transition-colors",
+    isActive ? "bg-blue-500/80 text-white" : "text-white/60 hover:text-white"
+  );
+  
+  if (onClick) {
+    return (
+      <button className={className} onClick={onClick}>
+        <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
+        <span className="text-xs">{label}</span>
+      </button>
+    );
+  }
+  
+  return (
+    <Link to={to} className={className}>
+      <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
+      <span className="text-xs">{label}</span>
+    </Link>
   );
 };
 

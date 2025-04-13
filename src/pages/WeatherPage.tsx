@@ -1,13 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWeather } from '@/features/weather/hooks/useWeather';
+import { toast } from "sonner";
 import WeatherLayout from '@/components/layout/WeatherLayout';
 import WeatherHeader from '@/features/weather/components/WeatherHeader';
-import CurrentWeather from '@/components/CurrentWeather';
-import WeeklyGraph from '@/components/WeeklyGraph';
-import ForecastSection from '@/components/ForecastSection';
-import HourlyChart from '@/components/HourlyChart';
-import { getWeatherBackground } from '@/lib/weather-utils';
+import WeatherDashboard from '@/features/weather/components/WeatherDashboard';
 
 const WeatherPage: React.FC = () => {
   const {
@@ -15,18 +12,11 @@ const WeatherPage: React.FC = () => {
     currentWeather,
     forecast,
     isLoading,
+    bgGradient,
     handleSearch,
     handleLocationAccess
   } = useWeather();
   const [locationStatus, setLocationStatus] = useState<string>("");
-  const [bgGradient, setBgGradient] = useState<string>("bg-[#FFDE5F]");
-
-  useEffect(() => {
-    // Set background based on weather condition
-    if (currentWeather?.weather?.[0]?.main) {
-      setBgGradient(getWeatherBackground(currentWeather.weather[0].main));
-    }
-  }, [currentWeather]);
 
   useEffect(() => {
     // Check if browser supports geolocation
@@ -78,44 +68,27 @@ const WeatherPage: React.FC = () => {
     }
   }, [handleLocationAccess, handleSearch]);
 
-  const temperature = currentWeather?.current?.temperature_2m || 
-                     (currentWeather?.main?.temp !== undefined ? Math.round(currentWeather.main.temp) : 0);
-  
-  const weatherCondition = currentWeather?.weather?.[0]?.main || "Clear";
-
   return (
-    <WeatherLayout showFooter={true} bgGradient={bgGradient}>
-      <div className="space-y-6">
-        {currentWeather && (
-          <WeatherHeader 
-            city={currentWeather.name || currentCity} 
-            country={currentWeather.sys?.country || ''} 
-            temperature={temperature}
-            condition={weatherCondition}
-            onSearch={handleSearch} 
-          />
-        )}
+    <WeatherLayout bgGradient={bgGradient}>
+      {currentWeather && (
+        <WeatherHeader 
+          city={currentWeather.name || currentCity} 
+          country={currentWeather.sys?.country || ''} 
+          onSearch={handleSearch} 
+        />
+      )}
 
-        {locationStatus && (
-          <div className="mb-4 text-sm text-black px-2">
-            {locationStatus}
-          </div>
-        )}
+      {locationStatus && (
+        <div className="mb-4 text-sm text-white/70 px-2">
+          {locationStatus}
+        </div>
+      )}
 
-        <CurrentWeather data={currentWeather} isLoading={isLoading} />
-        
-        <div className="mt-6">
-          <HourlyChart data={forecast} isLoading={isLoading} />
-        </div>
-        
-        <div className="mt-6">
-          <WeeklyGraph data={forecast} isLoading={isLoading} />
-        </div>
-        
-        <div className="mt-6 mb-24">
-          <ForecastSection data={forecast} isLoading={isLoading} />
-        </div>
-      </div>
+      <WeatherDashboard
+        currentWeather={currentWeather}
+        forecast={forecast}
+        isLoading={isLoading}
+      />
     </WeatherLayout>
   );
 };
