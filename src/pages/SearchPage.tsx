@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import WeatherLayout from '@/components/layout/WeatherLayout';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, ArrowLeft, X } from 'lucide-react';
@@ -88,20 +87,6 @@ const SearchPage: React.FC = () => {
         </div>
       </div>
     </WeatherLayout>
-  );
-};
-
-const Link = ({ to, children, className = '' }) => {
-  const navigate = useNavigate();
-  const handleClick = (e) => {
-    e.preventDefault();
-    navigate(to);
-  };
-  
-  return (
-    <a href={to} onClick={handleClick} className={className}>
-      {children}
-    </a>
   );
 };
 
