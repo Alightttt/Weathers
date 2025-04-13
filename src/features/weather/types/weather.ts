@@ -1,52 +1,7 @@
 
+// Weather API types
+
 export interface WeatherData {
-  coord?: {
-    lon: number;
-    lat: number;
-  };
-  weather?: {
-    id: number;
-    main: string;
-    description: string;
-    icon: string;
-  }[];
-  base?: string;
-  main?: {
-    temp: number;
-    feels_like: number;
-    temp_min: number;
-    temp_max: number;
-    pressure: number;
-    humidity: number;
-  };
-  visibility?: number;
-  wind?: {
-    speed: number;
-    deg: number;
-  };
-  clouds?: {
-    all: number;
-  };
-  dt?: number;
-  sys?: {
-    type?: number;
-    id?: number;
-    country?: string;
-    sunrise?: number;
-    sunset?: number;
-  };
-  timezone?: number;
-  id?: number;
-  name?: string;
-  cod?: number;
-  
-  // Add rain property
-  rain?: {
-    '1h'?: number;
-    '3h'?: number;
-  };
-  
-  // Make all Open-Meteo fields optional to match actual usage
   current?: {
     temperature_2m?: number;
     relative_humidity_2m?: number;
@@ -90,50 +45,44 @@ export interface WeatherData {
     snowfall?: number[];
     relative_humidity_2m?: number[];
   };
+  name?: string;
+  sys?: {
+    country?: string;
+  };
+  weather?: Array<{
+    main: string;
+    description: string;
+    icon: string;
+  }>;
+  coord?: {
+    lon: number;
+    lat: number;
+  };
+  base?: string;
+  main?: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+  };
+  visibility?: number;
+  wind?: {
+    speed: number;
+    deg: number;
+  };
+  clouds?: {
+    all: number;
+  };
+  dt?: number;
+  timezone?: number;
+  id?: number;
+  cod?: number;
+  rain?: {
+    '1h'?: number;
+    '3h'?: number;
+  };
 }
 
 export type ForecastData = WeatherData;
-
-export interface HourlyForecast {
-  dt: number;
-  main: {
-    temp: number;
-  };
-  weather: {
-    main: string;
-    description: string;
-    icon: string;
-  }[];
-  pop: number;
-}
-
-export interface DailyForecast {
-  dt: number;
-  temp: {
-    day: number;
-    min: number;
-    max: number;
-  };
-  temp_min: number;
-  temp_max: number;
-  weather: {
-    main: string;
-    description: string;
-    icon: string;
-  }[];
-  pop: number;
-}
-
-export type WeatherCondition = 
-  | 'Clear'
-  | 'Clouds'
-  | 'Rain'
-  | 'Thunderstorm'
-  | 'Drizzle'
-  | 'Snow'
-  | 'Mist'
-  | 'Fog'
-  | 'Haze'
-  | 'Dust'
-  | 'Smoke'
-  | 'Tornado';

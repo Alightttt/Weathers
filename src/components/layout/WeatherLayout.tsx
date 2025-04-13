@@ -48,12 +48,10 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
         <div className="h-16"></div> {/* Space for footer */}
       </div>
       
-      {/* Fixed footer */}
-      {showFooter && (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <WeatherNavBar />
-        </div>
-      )}
+      {/* Always show footer */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <WeatherNavBar />
+      </div>
       
       <Toaster position="top-center" />
     </div>

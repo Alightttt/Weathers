@@ -2,9 +2,10 @@
 import { ForecastData } from '@/features/weather/types/weather';
 import { getDailyForecasts } from '@/lib/weather-utils';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useState, useEffect } from 'react';
 import { WeatherIcon } from './WeatherIcons';
+import { Sun, Cloud, CloudRain } from 'lucide-react';
 
 interface WeeklyGraphProps {
   data: ForecastData | null;
@@ -30,15 +31,37 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
     }
   };
 
-  if (!data) {
-    return null;
+  if (!data || isLoading) {
+    return (
+      <Card className="bg-black/40 backdrop-blur-md border-white/10 rounded-3xl shadow-xl">
+        <CardHeader className="pb-2 pt-4">
+          <h3 className="text-white/90 font-medium">Weekly Forecast</h3>
+        </CardHeader>
+        <CardContent className="pb-4">
+          <div className="h-40 flex items-center justify-center">
+            <p className="text-white/70">Loading weather data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   // Get daily forecast data
   const dailyForecasts = getDailyForecasts(data);
   
   if (!dailyForecasts || dailyForecasts.length === 0) {
-    return null;
+    return (
+      <Card className="bg-black/40 backdrop-blur-md border-white/10 rounded-3xl shadow-xl">
+        <CardHeader className="pb-2 pt-4">
+          <h3 className="text-white/90 font-medium">Weekly Forecast</h3>
+        </CardHeader>
+        <CardContent className="pb-4">
+          <div className="h-40 flex items-center justify-center">
+            <p className="text-white/70">No forecast data available</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   // Format data for the chart with temperature conversion
@@ -56,36 +79,53 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
         <h3 className="text-white/90 font-medium">Weekly Forecast</h3>
       </CardHeader>
       <CardContent className="pb-4">
-        <div className="h-32 w-full mb-6">
+        <div className="h-44 w-full mb-6">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
+              margin={{ top: 20, right: 15, left: 15, bottom: 5 }}
             >
               <defs>
-                <linearGradient id="temperatureGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="maxTempGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#FFD700" stopOpacity={0.8}/>
                   <stop offset="95%" stopColor="#FFD700" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="minTempGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#48CAE4" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#48CAE4" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <XAxis 
                 dataKey="name" 
-                tick={false}
+                tick={{ fill: '#fff', opacity: 0.7, fontSize: 12 }}
                 axisLine={{ stroke: '#ffffff30' }}
                 tickLine={false}
               />
               <YAxis 
-                tick={false}
+                tick={{ fill: '#fff', opacity: 0.7, fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
+              />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.2)' }}
+                labelStyle={{ color: '#fff' }}
+                itemStyle={{ color: '#fff' }}
               />
               <Line 
                 type="monotone" 
                 dataKey="max" 
                 stroke="#FFD700" 
                 strokeWidth={3}
-                dot={false}
-                activeDot={false}
+                dot={{ stroke: '#FFD700', strokeWidth: 2, r: 4, fill: '#FFD700' }}
+                activeDot={{ stroke: '#FFD700', strokeWidth: 2, r: 6, fill: '#FFD700' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="min" 
+                stroke="#48CAE4" 
+                strokeWidth={3}
+                dot={{ stroke: '#48CAE4', strokeWidth: 2, r: 4, fill: '#48CAE4' }}
+                activeDot={{ stroke: '#48CAE4', strokeWidth: 2, r: 6, fill: '#48CAE4' }}
               />
             </LineChart>
           </ResponsiveContainer>

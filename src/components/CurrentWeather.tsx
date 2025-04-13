@@ -98,7 +98,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     return (
       <Card className="backdrop-blur-md bg-black/40 border-white/10 p-4 relative z-20 rounded-3xl shadow-xl">
         <div className="text-center text-white/70">
-          Waiting for weather data...
+          Loading weather data...
         </div>
       </Card>
     );
@@ -146,6 +146,11 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const displayFeelsLike = Math.round(convertTemperature(feelsLike));
   const displayWindSpeed = Math.round(convertWindSpeed(windSpeed));
 
+  // Safely handle rain data (fix for the TypeScript error)
+  const rainAmount = data.rain && typeof data.rain === 'object' && '1h' in data.rain 
+    ? data.rain['1h'] 
+    : '0';
+
   return (
     <Card className="backdrop-blur-md bg-black/40 border-white/10 p-4 relative z-20 rounded-3xl shadow-xl">
       <div className="flex items-center mb-1">
@@ -192,7 +197,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         
         <WeatherDetail 
           icon={<CloudRain className="h-5 w-5" />} 
-          value={(data.rain && data.rain['1h']) ? `${data.rain['1h']}mm` : '0mm'} 
+          value={`${rainAmount}mm`} 
           label="Rainfall" 
         />
       </div>

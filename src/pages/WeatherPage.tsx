@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWeather } from '@/features/weather/hooks/useWeather';
+import { toast } from "sonner";
 import WeatherLayout from '@/components/layout/WeatherLayout';
 import WeatherHeader from '@/features/weather/components/WeatherHeader';
 import WeatherDashboard from '@/features/weather/components/WeatherDashboard';
-import LocationPrompt from '@/features/location/components/LocationPrompt';
 
 const WeatherPage: React.FC = () => {
   const {
@@ -16,78 +16,63 @@ const WeatherPage: React.FC = () => {
     handleSearch,
     handleLocationAccess
   } = useWeather();
-  const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
   const [locationStatus, setLocationStatus] = useState<string>("");
 
   useEffect(() => {
-    // Check if we've shown the location prompt before
-    const hasPrompted = localStorage.getItem('locationPrompted');
-    
-    if (hasPrompted === 'true') {
-      setLocationPrompted(true);
-      
-      // Check if we already have permission
-      if (navigator.permissions) {
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-          if (result.state === 'granted') {
-            // Permission was already granted, use it
-            setLocationStatus("Using your location");
-            handleLocationAccess();
-          } else {
-            // Use default city - New York
-            setLocationStatus("Using default location: New York");
-            handleSearch('New York');
-          }
-        }).catch(() => {
-          // Handle error
+    // Check if browser supports geolocation
+    if (navigator.geolocation) {
+      // Try to get user location automatically
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'granted') {
+          // Location permission already granted, get weather
+          setLocationStatus("Getting weather for your location...");
+          handleLocationAccess().then(success => {
+            if (success) {
+              setLocationStatus("Using your location");
+              toast.success("Weather updated using your location");
+            } else {
+              setLocationStatus("Could not access location. Using New York");
+              handleSearch('New York');
+            }
+          });
+        } else if (result.state === 'prompt') {
+          // Will be asked for permission
+          navigator.geolocation.getCurrentPosition(
+            () => {
+              setLocationStatus("Getting weather for your location...");
+              handleLocationAccess().then(success => {
+                if (success) {
+                  setLocationStatus("Using your location");
+                  toast.success("Weather updated using your location");
+                }
+              });
+            },
+            () => {
+              // User denied permission when prompted
+              setLocationStatus("Using default location: New York");
+              handleSearch('New York');
+              toast.info("Using default location: New York. Allow location access for local weather.");
+            }
+          );
+        } else {
+          // Permission denied
           setLocationStatus("Using default location: New York");
           handleSearch('New York');
-        });
-      } else {
+        }
+      }).catch(() => {
+        // Error checking permission
         setLocationStatus("Using default location: New York");
         handleSearch('New York');
-      }
+      });
     } else {
-      setLocationPrompted(false);
+      // Geolocation not supported
+      setLocationStatus("Using default location: New York");
+      handleSearch('New York');
     }
   }, [handleLocationAccess, handleSearch]);
 
-  const handleAllowLocation = async () => {
-    setLocationPrompted(true);
-    localStorage.setItem('locationPrompted', 'true');
-    setLocationStatus("Getting weather for your location...");
-    const success = await handleLocationAccess();
-    if (success) {
-      setLocationStatus("Using your location");
-    } else {
-      setLocationStatus("Could not access location. Using New York");
-    }
-  };
-
-  const handleDenyLocation = () => {
-    setLocationPrompted(true);
-    localStorage.setItem('locationPrompted', 'true');
-    setLocationStatus("Using default location: New York");
-    handleSearch('New York');
-  };
-
-  if (!locationPrompted) {
-    return (
-      <WeatherLayout showFooter={true}>
-        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
-          <div className="max-w-md w-full mx-auto">
-            <LocationPrompt 
-              onAllowLocation={handleAllowLocation}
-              onDenyLocation={handleDenyLocation}
-            />
-          </div>
-        </div>
-      </WeatherLayout>
-    );
-  }
-
   return (
-    <WeatherLayout bgGradient={bgGradient} showFooter={true}>
+    <WeatherLayout bgGradient={bgGradient}>
       {currentWeather && (
         <WeatherHeader 
           city={currentWeather.name || currentCity} 

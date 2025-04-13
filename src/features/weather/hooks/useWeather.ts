@@ -1,5 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
+import { toast } from "sonner";
 import { WeatherData, ForecastData } from '../types/weather';
 import { 
   fetchCurrentWeather, 
@@ -26,7 +27,7 @@ export const useWeather = () => {
         fetchForecast(city, coords)
       ]);
 
-      // Ensure temperature values are correct - no +1 degree discrepancy
+      // Ensure temperature values are correct
       if (weatherData.main && typeof weatherData.main.temp === 'number') {
         weatherData.main.temp = Math.round(weatherData.main.temp);
       }
@@ -68,8 +69,12 @@ export const useWeather = () => {
             setBgGradient('from-gray-950 to-gray-900');
         }
       }
+      
+      return true;
     } catch (error) {
       console.error('Error fetching weather data:', error);
+      toast.error('Could not fetch weather data. Please try again.');
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +84,15 @@ export const useWeather = () => {
     try {
       setIsLoading(true);
       const coords = await getUserCoordinates();
-      await loadWeatherData("", coords); // Empty city string as we'll get it from coords
-      return true;
+      const success = await loadWeatherData("", coords); // Empty city string as we'll get it from coords
+      if (success) {
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error('Error getting user coordinates:', error);
       // Fall back to last city or New York
-      loadWeatherData(getLastCity() || "New York");
+      await loadWeatherData(getLastCity() || "New York");
       return false;
     }
   }, [loadWeatherData]);
@@ -98,7 +106,7 @@ export const useWeather = () => {
   useEffect(() => {
     const initialLoad = async () => {
       if (!currentWeather) {
-        loadWeatherData(currentCity || "New York");
+        await loadWeatherData(currentCity || "New York");
       }
     };
 

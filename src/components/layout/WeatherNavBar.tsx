@@ -1,18 +1,15 @@
 
 import React from 'react';
-import { Home, Search, Map, Settings, RefreshCw } from 'lucide-react';
+import { Home, Search, Map, Settings } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
-import { useWeather } from '@/features/weather/hooks/useWeather';
 import { cn } from '@/lib/utils';
 
 const WeatherNavBar: React.FC = () => {
   const location = useLocation();
-  const { handleLocationAccess } = useWeather();
   
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
     { icon: Search, label: 'Search', path: '/search' },
-    { icon: RefreshCw, label: 'Refresh', path: '#', action: handleLocationAccess },
     { icon: Map, label: 'Map', path: '/map' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
@@ -29,7 +26,6 @@ const WeatherNavBar: React.FC = () => {
               Icon={item.icon}
               label={item.label}
               isActive={isActive}
-              onClick={item.action}
               to={item.path}
             />
           );
