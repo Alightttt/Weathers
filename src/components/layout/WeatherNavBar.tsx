@@ -1,68 +1,78 @@
 
 import React from 'react';
-import { Home, Search, Settings, HelpCircle } from 'lucide-react';
-import { useLocation, Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { Link, useLocation } from 'react-router-dom';
+import { Settings, Home, HelpCircle, Twitter, Github } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const WeatherNavBar: React.FC = () => {
   const location = useLocation();
   
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+  
   const navItems = [
-    { icon: Home, label: 'Home', path: '/' },
-    { icon: Search, label: 'Search', path: '/search' },
-    { icon: HelpCircle, label: 'Help', path: '/help' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { 
+      path: '/', 
+      icon: <Home className="w-5 h-5" />, 
+      label: 'Home', 
+      isActive: isActive('/') 
+    },
+    { 
+      path: '/settings', 
+      icon: <Settings className="w-5 h-5" />, 
+      label: 'Settings', 
+      isActive: isActive('/settings') 
+    },
+    { 
+      path: '/about', 
+      icon: <Github className="w-5 h-5" />, 
+      label: 'About', 
+      isActive: isActive('/about'),
+      href: 'https://github.com/Alightttt'
+    },
+    { 
+      path: '/help', 
+      icon: <Twitter className="w-5 h-5" />, 
+      label: 'Help',
+      isActive: isActive('/help')
+    }
   ];
   
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="bg-white/20 backdrop-blur-xl rounded-t-2xl px-2 py-2 flex justify-around items-center">
-        {navItems.map((item, index) => {
-          const isActive = location.pathname === item.path;
-          
-          return (
-            <NavButton
-              key={index}
-              Icon={item.icon}
-              label={item.label}
-              isActive={isActive}
-              to={item.path}
-            />
-          );
-        })}
+    <div className="bg-white/80 backdrop-blur-md py-4 px-6 border-t border-gray-200">
+      <div className="max-w-md mx-auto">
+        <div className="flex justify-around items-center">
+          {navItems.map((item) => (
+            <React.Fragment key={item.path}>
+              {item.href ? (
+                <a 
+                  href={item.href} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex flex-col items-center text-sm font-medium text-gray-500 hover:text-black"
+                >
+                  {React.cloneElement(item.icon, { 
+                    className: `w-5 h-5 ${item.isActive ? 'text-blue-500' : 'text-gray-500'}`
+                  })}
+                  <span className="mt-1 text-xs">{item.label}</span>
+                </a>
+              ) : (
+                <Link 
+                  to={item.path} 
+                  className="flex flex-col items-center text-sm font-medium text-gray-500 hover:text-black"
+                >
+                  {React.cloneElement(item.icon, { 
+                    className: `w-5 h-5 ${item.isActive ? 'text-blue-500' : 'text-gray-500'}`
+                  })}
+                  <span className="mt-1 text-xs">{item.label}</span>
+                </Link>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
-  );
-};
-
-interface NavButtonProps {
-  Icon: React.FC<{ className?: string }>;
-  label: string;
-  isActive: boolean;
-  onClick?: () => void;
-  to: string;
-}
-
-const NavButton: React.FC<NavButtonProps> = ({ Icon, label, isActive, onClick, to }) => {
-  const className = cn(
-    "flex flex-col items-center justify-center p-2 rounded-xl transition-colors",
-    isActive ? "bg-blue-500/80 text-white" : "text-white/60 hover:text-white"
-  );
-  
-  if (onClick) {
-    return (
-      <button className={className} onClick={onClick}>
-        <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
-        <span className="text-xs">{label}</span>
-      </button>
-    );
-  }
-  
-  return (
-    <Link to={to} className={className}>
-      <Icon className={cn("h-5 w-5 mb-1", isActive && "text-white")} />
-      <span className="text-xs">{label}</span>
-    </Link>
   );
 };
 

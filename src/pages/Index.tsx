@@ -1,10 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import CitySearch from '@/components/CitySearch';
 import CurrentWeather from '@/components/CurrentWeather';
-import ForecastSection from '@/components/ForecastSection';
-import HourlyChart from '@/components/HourlyChart';
 import WeeklyGraph from '@/components/WeeklyGraph';
 import LocationHeader from '@/components/LocationHeader';
 import GeolocationPrompt from '@/components/GeolocationPrompt';
@@ -13,8 +10,7 @@ import {
   fetchForecast, 
   getUserCoordinates,
   getLastCity, 
-  saveLastCity, 
-  getWeatherBackground
+  saveLastCity
 } from '@/lib/weather-utils';
 import { WeatherData, ForecastData } from '@/features/weather/types/weather';
 
@@ -24,7 +20,6 @@ const Index = () => {
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [bgGradient, setBgGradient] = useState<string>("from-gray-950 to-gray-900");
   const [locationPrompted, setLocationPrompted] = useState<boolean>(false);
 
   const loadWeatherData = async (city: string, coords?: {latitude: number, longitude: number}) => {
@@ -40,11 +35,6 @@ const Index = () => {
       setForecast(forecastData as ForecastData);
       setCurrentCity(weatherData.name || city);
       saveLastCity(weatherData.name || city);
-
-      // Set background gradient based on weather condition
-      if (weatherData.weather && weatherData.weather[0]) {
-        setBgGradient(getWeatherBackground(weatherData.weather[0].main));
-      }
     } catch (error) {
       console.error('Error fetching weather data:', error);
     } finally {
@@ -107,18 +97,8 @@ const Index = () => {
 
   if (!locationPrompted) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-gradient-to-b from-gray-900 to-gray-800">
-        {/* Background image */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 
-            alt="Nature background" 
-            className="object-cover w-full h-full opacity-40"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
-        </div>
-        
-        <div className="max-w-md w-full mx-auto relative z-10">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-[#f2f2f2]">
+        <div className="max-w-md w-full mx-auto">
           <GeolocationPrompt 
             onAllowLocation={handleAllowLocation} 
             onDenyLocation={handleDenyLocation} 
@@ -128,24 +108,20 @@ const Index = () => {
     );
   }
 
+  const weatherCondition = currentWeather?.weather?.[0]?.main || "Clear";
+  const temperature = currentWeather?.current?.temperature_2m || 
+                     (currentWeather?.main?.temp !== undefined ? Math.round(currentWeather.main.temp) : 0);
+
   return (
-    <div className="min-h-screen relative py-6 px-4 transition-colors duration-1000">
-      {/* Nature background image */}
-      <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 
-          alt="Nature background" 
-          className="object-cover w-full h-full opacity-40"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60"></div>
-      </div>
-      
-      <div className="max-w-md mx-auto relative z-10">
+    <div className="min-h-screen bg-[#FFDE5F] py-6 px-4 transition-colors duration-1000">
+      <div className="max-w-md mx-auto">
         <div className="mb-6">
           {currentWeather && (
             <LocationHeader 
               city={currentWeather.name || currentCity} 
               country={currentWeather?.sys?.country || ''}
+              temperature={temperature}
+              condition={weatherCondition}
               onSearch={handleSearch}
             />
           )}
@@ -153,16 +129,8 @@ const Index = () => {
         
         <CurrentWeather data={currentWeather} isLoading={isLoading} />
         
-        <div className="mt-4">
-          <HourlyChart data={forecast} isLoading={isLoading} />
-        </div>
-        
-        <div className="mt-4">
+        <div className="mt-6">
           <WeeklyGraph data={forecast} isLoading={isLoading} />
-        </div>
-        
-        <div className="mt-4 mb-16">
-          <ForecastSection data={forecast} isLoading={isLoading} />
         </div>
       </div>
     </div>

@@ -16,7 +16,6 @@ export const useWeather = () => {
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [bgGradient, setBgGradient] = useState<string>("from-gray-950 to-gray-900");
 
   const loadWeatherData = useCallback(async (city: string, coords?: Coordinates) => {
     setIsLoading(true);
@@ -42,36 +41,6 @@ export const useWeather = () => {
       if (weatherData.name) {
         setCurrentCity(weatherData.name);
         saveLastCity(weatherData.name);
-      }
-
-      // Set background gradient based on weather condition
-      if (weatherData.weather && weatherData.weather[0]) {
-        const condition = weatherData.weather[0].main;
-        switch (condition) {
-          case 'Clear':
-            setBgGradient('from-blue-400 to-blue-600');
-            break;
-          case 'Clouds':
-            setBgGradient('from-gray-400 to-slate-600');
-            break;
-          case 'Rain':
-          case 'Drizzle':
-            setBgGradient('from-gray-600 to-gray-800');
-            break;
-          case 'Thunderstorm':
-            setBgGradient('from-gray-800 to-gray-950');
-            break;
-          case 'Snow':
-            setBgGradient('from-slate-200 to-slate-400');
-            break;
-          case 'Mist':
-          case 'Fog':
-          case 'Haze':
-            setBgGradient('from-gray-400 to-gray-600');
-            break;
-          default:
-            setBgGradient('from-gray-950 to-gray-900');
-        }
       }
       
       return true;
@@ -122,7 +91,6 @@ export const useWeather = () => {
     currentWeather,
     forecast,
     isLoading,
-    bgGradient,
     handleSearch,
     handleLocationAccess
   };

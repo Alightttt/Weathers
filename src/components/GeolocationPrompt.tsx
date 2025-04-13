@@ -17,23 +17,23 @@ const GeolocationPrompt = ({ onAllowLocation, onDenyLocation }: GeolocationPromp
   };
 
   return (
-    <div className="text-center p-6 bg-black/30 backdrop-blur-md rounded-3xl border border-white/10">
+    <div className="text-center p-6 bg-[#FFDE5F] rounded-3xl">
       <div className="flex justify-center mb-4">
-        <div className="w-16 h-16 rounded-full bg-blue-500/30 flex items-center justify-center">
-          <MapPin className="h-8 w-8 text-white" />
+        <div className="w-16 h-16 rounded-full bg-white/30 flex items-center justify-center">
+          <MapPin className="h-8 w-8 text-black" />
         </div>
       </div>
       
-      <h2 className="text-xl font-semibold text-white mb-2">Location Access</h2>
-      <p className="text-white/80 mb-6">
-        Allow access to your location for accurate weather information for your area.
+      <h2 className="text-xl font-semibold text-black mb-2">Weather Widgets</h2>
+      <p className="text-black mb-6">
+        Allow access to your location for accurate weather information.
       </p>
       
       <div className="space-y-3">
         <Button 
           onClick={handleAllowLocation}
           disabled={isRequesting}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+          className="w-full bg-black hover:bg-black/90 text-white"
         >
           {isRequesting ? "Getting location..." : "Allow location access"}
         </Button>
@@ -41,7 +41,7 @@ const GeolocationPrompt = ({ onAllowLocation, onDenyLocation }: GeolocationPromp
         <Button 
           onClick={onDenyLocation}
           variant="outline" 
-          className="w-full border-white/20 text-white hover:bg-white/10"
+          className="w-full border-black text-black hover:bg-black/10"
         >
           Use default location
         </Button>

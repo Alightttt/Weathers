@@ -51,70 +51,66 @@ export const AnimatedWeatherIcon = ({ weatherCondition, size = 'medium' }: Weath
     large: 'w-40 h-40' // Made the large size bigger
   };
 
-  // Sunny weather
-  if (condition.includes('sun') || condition.includes('clear')) {
+  // Create dot pattern for sun
+  const renderSunDots = () => {
     return (
-      <div className={`weather-icon ${sizeClass[size]}`}>
-        <Sun className="w-full h-full text-amber-300 animate-spin-slow" />
+      <div className={`relative ${sizeClass[size]}`}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-3/4 h-3/4 rounded-full bg-[#FFDE5F] grid grid-cols-6 gap-1">
+            {Array.from({ length: 36 }).map((_, i) => (
+              <div key={i} className="bg-black rounded-full w-1 h-1"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
+  };
+
+  // Create dot pattern for clouds
+  const renderCloudDots = () => {
+    return (
+      <div className={`relative ${sizeClass[size]}`}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full h-1/2 bg-transparent grid grid-cols-8 gap-1">
+            {Array.from({ length: 32 }).map((_, i) => (
+              <div key={i} className="bg-black rounded-full w-1 h-1"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Sunny weather
+  if (condition.includes('sun') || condition.includes('clear')) {
+    return renderSunDots();
   }
   
   // Cloudy weather
-  if (condition.includes('cloud') && !condition.includes('rain') && !condition.includes('thunder')) {
-    return (
-      <div className={`weather-icon ${sizeClass[size]}`}>
-        <Cloud className="w-full h-full text-gray-300 animate-float" />
-      </div>
-    );
+  if (condition.includes('cloud')) {
+    return renderCloudDots();
   }
 
   // Rainy weather
   if (condition.includes('rain') || condition.includes('drizzle')) {
     return (
-      <div className={`weather-icon ${sizeClass[size]}`}>
-        <CloudRain className="w-full h-full text-blue-400 animate-pulse" />
-      </div>
-    );
-  }
-
-  // Thunderstorm
-  if (condition.includes('thunder') || condition.includes('storm')) {
-    return (
       <div className={`weather-icon ${sizeClass[size]} relative`}>
-        <Cloud className="w-full h-full text-gray-500" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-1/2 h-1/2">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-0 w-1/3 h-1/2 bg-yellow-300 animate-lightning z-20" 
-                 style={{ clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }}></div>
+          <div className="w-3/4 h-1/2 rounded-full grid grid-cols-6 gap-1">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <div key={i} className="bg-black rounded-full w-1 h-1"></div>
+            ))}
           </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center space-x-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="w-1 h-4 bg-blue-400 rounded-full animate-bounce"></div>
+          ))}
         </div>
       </div>
     );
   }
 
-  // Snow
-  if (condition.includes('snow')) {
-    return (
-      <div className={`weather-icon ${sizeClass[size]}`}>
-        <Snowflake className="w-full h-full text-blue-100 animate-float" />
-      </div>
-    );
-  }
-  
-  // Foggy weather
-  if (condition.includes('fog') || condition.includes('mist')) {
-    return (
-      <div className={`weather-icon ${sizeClass[size]}`}>
-        <CloudFog className="w-full h-full text-gray-400 animate-pulse" />
-      </div>
-    );
-  }
-
-  // Default
-  return (
-    <div className={`weather-icon ${sizeClass[size]}`}>
-      <CloudSun className="w-full h-full text-gray-300" />
-    </div>
-  );
+  // Default to sun dots (like in the image)
+  return renderSunDots();
 };
