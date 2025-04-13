@@ -1,4 +1,3 @@
-
 import { WeatherData } from '@/features/weather/types/weather';
 import { degreesToDirection } from '@/lib/weather-utils';
 import { Droplets, Wind, Thermometer, CloudRain, Compass } from 'lucide-react';
@@ -38,19 +37,16 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const [windSpeedUnit, setWindSpeedUnit] = useState<string>(localStorage.getItem('windSpeedUnit') || 'km/h');
 
   useEffect(() => {
-    // Set temperature unit from settings
     const savedTempUnit = localStorage.getItem('temperatureUnit');
     if (savedTempUnit) {
       setTemperatureUnit(savedTempUnit);
     }
 
-    // Set wind speed unit from settings
     const savedWindUnit = localStorage.getItem('windSpeedUnit');
     if (savedWindUnit) {
       setWindSpeedUnit(savedWindUnit);
     }
 
-    // Set weather animation based on condition
     if (data?.weather && data.weather[0]) {
       const condition = data.weather[0].main;
       switch (condition) {
@@ -82,22 +78,18 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     }
   }, [data]);
 
-  // Convert temperature based on unit
   const convertTemperature = (temp: number): number => {
     if (temperatureUnit === '°C') {
       return temp;
     } else {
-      // Convert to Fahrenheit
       return (temp * 9/5) + 32;
     }
   };
 
-  // Convert wind speed based on unit
   const convertWindSpeed = (speed: number): number => {
     if (windSpeedUnit === 'km/h') {
       return speed;
     } else {
-      // Convert to mph
       return speed * 0.621371;
     }
   };
@@ -120,7 +112,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
   const weatherCondition = data.weather?.[0]?.main || "Clear";
   const weatherDescription = data.weather?.[0]?.description || "clear";
   
-  // Safely access wind direction
   let windDirection = 'N/A';
   if (data.current?.wind_direction_10m !== undefined) {
     windDirection = degreesToDirection(data.current.wind_direction_10m);
@@ -128,7 +119,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     windDirection = degreesToDirection(data.wind.deg);
   }
   
-  // Safely access temperature
   let temperature = 0;
   if (data.current?.temperature_2m !== undefined) {
     temperature = data.current.temperature_2m;
@@ -136,7 +126,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     temperature = Math.round(data.main.temp);
   }
   
-  // Safely access humidity
   let humidity = 0;
   if (data.current?.relative_humidity_2m !== undefined) {
     humidity = data.current.relative_humidity_2m;
@@ -144,7 +133,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     humidity = data.main.humidity;
   }
   
-  // Safely access wind speed
   let windSpeed = 0;
   if (data.current?.wind_speed_10m !== undefined) {
     windSpeed = data.current.wind_speed_10m;
@@ -152,7 +140,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     windSpeed = data.wind.speed;
   }
 
-  // Safely access feels like
   let feelsLike = 0;
   if (data.current?.apparent_temperature !== undefined) {
     feelsLike = data.current.apparent_temperature;
@@ -160,7 +147,6 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
     feelsLike = Math.round(data.main.feels_like);
   }
 
-  // Convert temperature and wind speed based on settings
   const displayTemperature = Math.round(convertTemperature(temperature));
   const displayFeelsLike = Math.round(convertTemperature(feelsLike));
   const displayWindSpeed = Math.round(convertWindSpeed(windSpeed));
@@ -211,7 +197,7 @@ const CurrentWeather = ({ data, isLoading }: CurrentWeatherProps) => {
         
         <WeatherDetail 
           icon={<CloudRain className="h-5 w-5" />} 
-          value={data.rain ? `${data.rain['1h'] || 0}mm` : '0mm'} 
+          value={(data.rain && data.rain['1h']) ? `${data.rain['1h']}mm` : '0mm'} 
           label="Rainfall" 
         />
       </div>

@@ -40,6 +40,12 @@ export interface WeatherData {
   name?: string;
   cod?: number;
   
+  // Add rain property
+  rain?: {
+    '1h'?: number;
+    '3h'?: number;
+  };
+  
   // Make all Open-Meteo fields optional to match actual usage
   current?: {
     temperature_2m?: number;
