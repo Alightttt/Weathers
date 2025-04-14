@@ -19,6 +19,18 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
     if (savedTempUnit) {
       setTemperatureUnit(savedTempUnit);
     }
+    
+    // Add listener for temperature unit changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'temperatureUnit' && e.newValue) {
+        setTemperatureUnit(e.newValue);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Convert temperature based on unit
@@ -95,11 +107,13 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
                 tick={{ fill: '#fff', opacity: 0.7, fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
+                domain={['dataMin - 2', 'dataMax + 2']} // Add some padding
               />
               <Tooltip 
                 contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.2)' }}
                 labelStyle={{ color: '#fff' }}
                 itemStyle={{ color: '#fff' }}
+                formatter={(value: any) => [`${value}${temperatureUnit}`, 'Temperature']}
               />
               <Line 
                 type="monotone" 
@@ -108,6 +122,14 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
                 strokeWidth={3}
                 dot={{ stroke: '#FFD700', strokeWidth: 2, r: 4, fill: '#FFD700' }}
                 activeDot={{ stroke: '#FFD700', strokeWidth: 2, r: 6, fill: '#FFD700' }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="min" 
+                stroke="#90cdf4" 
+                strokeWidth={2}
+                dot={{ stroke: '#90cdf4', strokeWidth: 1, r: 3, fill: '#90cdf4' }}
+                activeDot={{ stroke: '#90cdf4', strokeWidth: 2, r: 5, fill: '#90cdf4' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -118,7 +140,7 @@ const WeeklyGraph = ({ data, isLoading }: WeeklyGraphProps) => {
             <div key={i} className="flex flex-col items-center bg-black/40 rounded-xl p-3">
               <span className="text-xs text-white/70">{day.name}</span>
               <div className="my-2">
-                <WeatherIcon weatherCondition={day.condition} size="medium" />
+                <WeatherIcon weatherCondition={day.condition} size="small" />
               </div>
               <div className="text-center">
                 <div className="text-amber-400 font-bold">{day.temp}°</div>

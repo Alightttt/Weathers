@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -177,19 +178,18 @@ body {
   to { transform: rotate(360deg); }
 }
 
-.animate-sunny {
-  animation: sunny-rotate 10s linear infinite;
-  color: #FFD700;
+.animate-spin-slow {
+  animation: sunny-rotate 15s linear infinite;
 }
 
-@keyframes clouds-float {
-  0% { transform: translateX(0px); }
-  50% { transform: translateX(10px); }
-  100% { transform: translateX(0px); }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
-.animate-clouds {
-  animation: clouds-float 8s ease-in-out infinite;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 @keyframes rain-fall {

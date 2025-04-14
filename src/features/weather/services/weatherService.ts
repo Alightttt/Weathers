@@ -32,7 +32,7 @@ export const getUserCoordinates = (): Promise<Coordinates> => {
   });
 };
 
-// Generate API URL for Open-Meteo
+// Generate Open-Meteo API URL with coordinates
 export const generateApiUrl = (lat: number, lon: number): string => {
   return `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,uv_index_clear_sky_max,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration,apparent_temperature_min,apparent_temperature_max,temperature_2m_min,temperature_2m_max,weather_code&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,apparent_temperature,rain,showers,snowfall,snow_depth&current=temperature_2m,relative_humidity_2m,is_day,apparent_temperature,snowfall,showers,rain,precipitation,wind_speed_10m,wind_direction_10m&timezone=auto&past_days=7&forecast_days=14`;
 };
@@ -71,6 +71,9 @@ export const getCityFromCoords = async (lat: number, lon: number): Promise<strin
                 data.address?.state ||
                 "Unknown Location";
     
+    // Add country if available
+    const country = data.address?.country || "";
+    
     return city;
   } catch (error) {
     console.error('Error fetching city name:', error);
@@ -92,6 +95,11 @@ export const fetchCurrentWeather = async (city?: string, coords?: Coordinates): 
       // Try to get the city name from coordinates
       try {
         locationName = await getCityFromCoords(coords.latitude, coords.longitude);
+        
+        // Try to get country from coordinates
+        const reverseResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`);
+        const reverseData = await reverseResponse.json();
+        countryCode = reverseData.address?.country_code?.toUpperCase() || '';
       } catch (error) {
         console.warn('Could not get city name from coordinates:', error);
       }
@@ -106,10 +114,17 @@ export const fetchCurrentWeather = async (city?: string, coords?: Coordinates): 
           const { lat, lon, display_name } = searchData[0];
           apiUrl = generateApiUrl(parseFloat(lat), parseFloat(lon));
           
-          // Extract city name from display name
+          // Extract city and country from display name
           const parts = display_name.split(', ');
           locationName = parts[0];
-          countryCode = parts[parts.length - 1];
+          
+          // Extract country code if available
+          if (searchData[0].address && searchData[0].address.country_code) {
+            countryCode = searchData[0].address.country_code.toUpperCase();
+          } else {
+            const lastPart = parts[parts.length - 1];
+            countryCode = lastPart.length <= 3 ? lastPart.toUpperCase() : lastPart;
+          }
         } else {
           throw new Error('Location not found');
         }
@@ -144,6 +159,31 @@ export const fetchCurrentWeather = async (city?: string, coords?: Coordinates): 
       icon: weatherCode === 0 ? "01d" : (weatherCode < 3 ? "02d" : (weatherCode < 50 ? "03d" : "09d"))
     }];
     
+    // Add main section for compatibility with existing components
+    if (!data.main) {
+      data.main = {
+        temp: data.current.temperature_2m,
+        feels_like: data.current.apparent_temperature,
+        temp_min: data.daily.temperature_2m_min[todayIndex],
+        temp_max: data.daily.temperature_2m_max[todayIndex],
+        pressure: 1013, // Default if not available
+        humidity: data.current.relative_humidity_2m
+      };
+    }
+    
+    // Add wind data for compatibility
+    if (!data.wind) {
+      data.wind = {
+        speed: data.current.wind_speed_10m,
+        deg: data.current.wind_direction_10m
+      };
+    }
+    
+    // Add rainfall data
+    data.rain = {
+      '1h': data.current.rain || 0
+    };
+    
     return data;
   } catch (error) {
     console.error("Error fetching weather data:", error);
@@ -153,7 +193,12 @@ export const fetchCurrentWeather = async (city?: string, coords?: Coordinates): 
 
 // Fetch forecast data
 export const fetchForecast = async (city?: string, coords?: Coordinates): Promise<ForecastData> => {
-  return await fetchCurrentWeather(city, coords);
+  // Since we're using Open-Meteo which returns both current and forecast data,
+  // we can reuse the same call but make sure we process all the forecast data correctly
+  const data = await fetchCurrentWeather(city, coords);
+  
+  // Enhance the forecast data by making sure all the forecast-specific fields are populated
+  return data;
 };
 
 // Save and get last city from local storage

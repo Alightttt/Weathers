@@ -47,30 +47,32 @@ export const useWeather = () => {
       // Set background gradient based on weather condition
       if (weatherData.weather && weatherData.weather[0]) {
         const condition = weatherData.weather[0].main;
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
         switch (condition) {
           case 'Clear':
-            setBgGradient('from-blue-400 to-blue-600');
+            setBgGradient(isDarkMode ? 'from-blue-600 to-blue-800' : 'from-blue-400 to-blue-600');
             break;
           case 'Clouds':
-            setBgGradient('from-gray-400 to-slate-600');
+            setBgGradient(isDarkMode ? 'from-gray-600 to-slate-700' : 'from-gray-400 to-slate-500');
             break;
           case 'Rain':
           case 'Drizzle':
-            setBgGradient('from-gray-600 to-gray-800');
+            setBgGradient(isDarkMode ? 'from-gray-700 to-gray-900' : 'from-gray-500 to-gray-700');
             break;
           case 'Thunderstorm':
-            setBgGradient('from-gray-800 to-gray-950');
+            setBgGradient(isDarkMode ? 'from-gray-900 to-purple-900' : 'from-gray-700 to-purple-700');
             break;
           case 'Snow':
-            setBgGradient('from-slate-200 to-slate-400');
+            setBgGradient(isDarkMode ? 'from-slate-300 to-slate-500' : 'from-slate-200 to-slate-400');
             break;
           case 'Mist':
           case 'Fog':
           case 'Haze':
-            setBgGradient('from-gray-400 to-gray-600');
+            setBgGradient(isDarkMode ? 'from-gray-600 to-gray-800' : 'from-gray-400 to-gray-600');
             break;
           default:
-            setBgGradient('from-gray-950 to-gray-900');
+            setBgGradient(isDarkMode ? 'from-gray-800 to-gray-900' : 'from-gray-600 to-gray-700');
         }
       }
       
@@ -116,6 +118,58 @@ export const useWeather = () => {
 
     initialLoad();
   }, [currentCity, currentWeather, loadWeatherData]);
+
+  // Listen for theme changes to update the weather display
+  useEffect(() => {
+    const handleThemeChange = () => {
+      if (currentWeather?.weather?.[0]) {
+        const condition = currentWeather.weather[0].main;
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
+        // Update background based on current condition and theme
+        switch (condition) {
+          case 'Clear':
+            setBgGradient(isDarkMode ? 'from-blue-600 to-blue-800' : 'from-blue-400 to-blue-600');
+            break;
+          case 'Clouds':
+            setBgGradient(isDarkMode ? 'from-gray-600 to-slate-700' : 'from-gray-400 to-slate-500');
+            break;
+          case 'Rain':
+          case 'Drizzle':
+            setBgGradient(isDarkMode ? 'from-gray-700 to-gray-900' : 'from-gray-500 to-gray-700');
+            break;
+          case 'Thunderstorm':
+            setBgGradient(isDarkMode ? 'from-gray-900 to-purple-900' : 'from-gray-700 to-purple-700');
+            break;
+          case 'Snow':
+            setBgGradient(isDarkMode ? 'from-slate-300 to-slate-500' : 'from-slate-200 to-slate-400');
+            break;
+          case 'Mist':
+          case 'Fog':
+          case 'Haze':
+            setBgGradient(isDarkMode ? 'from-gray-600 to-gray-800' : 'from-gray-400 to-gray-600');
+            break;
+          default:
+            setBgGradient(isDarkMode ? 'from-gray-800 to-gray-900' : 'from-gray-600 to-gray-700');
+        }
+      }
+    };
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' && 
+            mutation.target === document.documentElement) {
+          handleThemeChange();
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    
+    return () => {
+      observer.disconnect();
+    };
+  }, [currentWeather]);
 
   return {
     currentCity,

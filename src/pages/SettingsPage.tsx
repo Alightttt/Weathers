@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeatherLayout from '@/components/layout/WeatherLayout';
 import { ArrowLeft, ChevronRight, Sun, Moon, Droplets, Wind, Languages, Bell, Info, Link as LinkIcon, Twitter } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -22,11 +22,26 @@ const SettingsPage: React.FC = () => {
     localStorage.getItem('notifications') === 'true'
   );
   
+  useEffect(() => {
+    // Apply theme on component mount and when isDarkMode changes
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+  
   const handleDarkModeToggle = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', newMode);
+    
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
     toast.success(`${newMode ? 'Dark' : 'Light'} mode enabled`);
   };
 
@@ -154,11 +169,12 @@ const SettingsPage: React.FC = () => {
         },
         { 
           icon: LinkIcon, 
-          label: 'Help & Support', 
-          value: '', 
+          label: 'GitHub', 
+          value: 'alightcodes', 
           hasToggle: false, 
-          hasValue: false,
-          onClick: () => navigate('/help')
+          hasValue: true,
+          isLink: true,
+          linkUrl: 'https://github.com/alightcodes/weather-app'
         },
         { 
           icon: Info, 
