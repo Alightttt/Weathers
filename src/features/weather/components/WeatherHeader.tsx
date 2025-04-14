@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import CitySearch from '@/components/CitySearch';
-import Image from '@/components/ui/image';
 
 interface WeatherHeaderProps {
   city: string;
