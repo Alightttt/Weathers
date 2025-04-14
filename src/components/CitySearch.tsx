@@ -18,6 +18,11 @@ const CitySearch = ({ onSearch, defaultCity }: CitySearchProps) => {
     if (city.trim()) {
       onSearch(city.trim());
       setIsExpanded(false);
+      
+      // Refresh the page after a short delay to allow the weather data to update
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
     }
   };
 

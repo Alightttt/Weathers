@@ -14,6 +14,20 @@ const GeolocationPrompt = ({ onAllowLocation, onDenyLocation }: GeolocationPromp
   const handleAllowLocation = () => {
     setIsRequesting(true);
     onAllowLocation();
+    
+    // Refresh the page after a short delay to allow the weather data to update
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
+  const handleDenyLocation = () => {
+    onDenyLocation();
+    
+    // Refresh the page after selecting default location
+    setTimeout(() => {
+      window.location.reload();
+    }, 300);
   };
 
   return (
@@ -39,7 +53,7 @@ const GeolocationPrompt = ({ onAllowLocation, onDenyLocation }: GeolocationPromp
         </Button>
         
         <Button 
-          onClick={onDenyLocation}
+          onClick={handleDenyLocation}
           variant="outline" 
           className="w-full border-white/20 text-white hover:bg-white/10"
         >

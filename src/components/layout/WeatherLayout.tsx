@@ -31,8 +31,8 @@ const WeatherLayout: React.FC<WeatherLayoutProps> = ({
       {/* Nature background image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=2000" 
-          alt="Nature background" 
+          src="/lovable-uploads/d039234c-aa4c-4c6c-baa5-5088fa7cfe6d.png" 
+          alt="Tree canopy background" 
           className={`object-cover w-full h-full ${isDarkMode ? 'opacity-40' : 'opacity-20'}`}
         />
       </div>
