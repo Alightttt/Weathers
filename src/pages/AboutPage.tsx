@@ -29,7 +29,7 @@ const AboutPage: React.FC = () => {
                 <Cloud className="h-10 w-10 text-white/80 absolute -right-3 -bottom-2" />
               </div>
             </div>
-            <h2 className="text-xl font-bold text-white">Weather App</h2>
+            <h2 className="text-xl font-bold text-white">Weathers</h2>
             <p className="text-white/70 text-sm">Version 2.0.0</p>
             
             <div className="mt-6 flex justify-center space-x-4">
@@ -55,9 +55,9 @@ const AboutPage: React.FC = () => {
           <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-5">
             <h3 className="text-white font-medium mb-3">About the App</h3>
             <p className="text-white/80 text-sm">
-              Weather App is a modern, intuitive weather application designed to provide accurate and 
+              Weathers is a modern, intuitive weather application designed to provide accurate and 
               detailed weather information for any location around the world. With beautiful visualizations, 
-              hourly and 30-day forecasts, and an interactive map, Weather App helps you stay prepared 
+              hourly and 30-day forecasts, and an interactive map, Weathers helps you stay prepared 
               for any weather conditions.
             </p>
           </div>
